@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.capstone.puppy;
 
 import android.content.Context;
 
