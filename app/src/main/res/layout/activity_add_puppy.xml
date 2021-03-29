@@ -8,7 +8,7 @@
 
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/title"
@@ -19,7 +19,7 @@
         app:layout_constraintVertical_bias="0.88" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/iv_puppy"
         android:layout_width="213dp"
         android:layout_height="319dp"
         android:layout_marginTop="84dp"
@@ -34,9 +34,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:hint="이름을 입력해주세요"
         android:inputType="textPersonName"
         android:text="@string/profileInformation"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintBottom_toTopOf="@+id/btn_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
