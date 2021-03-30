@@ -3,19 +3,24 @@ package com.capstone.puppy;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.capstone.puppy.Items.ListViewAdapter;
 import com.capstone.puppy.Items.ListViewItem;
 
-public class SelectPuppyActivity extends AppCompatActivity {
+public class SelectPuppyActivity extends AppCompatActivity implements View.OnClickListener {
 
     static final String[] LIST_MENU = {"LIST1", "LIST2", "LIST3"} ;
+    Button button1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +58,22 @@ public class SelectPuppyActivity extends AppCompatActivity {
 
                 // TODO : use item data.
             }
-        }) ;
+        });
+        button1 = findViewById(R.id.button1);
+        button1.setOnClickListener(this);
 
 
+    }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            // 버튼을 누르면 애드퍼피 페이지로 이
+            case R.id.button1:
+                Intent intent = new Intent(this, AddPuppyActivity.class);
+                startActivity(intent);
+
+                break;
+
+        }
     }
 }
