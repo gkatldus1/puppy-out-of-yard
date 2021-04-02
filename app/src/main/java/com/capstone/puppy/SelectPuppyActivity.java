@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.capstone.puppy.Items.ListViewAdapter;
 import com.capstone.puppy.Items.ListViewItem;
 
-public class SelectPuppyActivity extends AppCompatActivity implements View.OnClickListener {
+public class SelectPuppyActivity extends AppCompatActivity implements ListViewAdapter.ListBtnClickListener {
 
     static final String[] LIST_MENU = {"LIST1", "LIST2", "LIST3"} ;
     Button button1;
@@ -59,21 +59,13 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
                 // TODO : use item data.
             }
         });
-        button1 = findViewById(R.id.button1);
-        button1.setOnClickListener(this);
-
-
     }
+
+
+
+
     @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            // 버튼을 누르면 애드퍼피 페이지로 이
-            case R.id.button1:
-                Intent intent = new Intent(this, AddPuppyActivity.class);
-                startActivity(intent);
-
-                break;
-
-        }
+    public void onListBtnClick(int position) {
+        Toast.makeText(this, Integer.toString(position+1) + " Item is selected..", Toast.LENGTH_SHORT).show() ;
     }
 }

@@ -77,4 +77,10 @@ public class ListViewAdapter extends BaseAdapter {
 
         listViewItemList.add(item);
     }
+    Button button1 = (Button) convertView.findViewById(R.id.button1);
+    button1.setOnClickListener(new Button.OnClickListener() {
+        public void onClick(View v) {
+            textTextView.setText(Integer.toString(pos + 1) + "번 아이템 선택.");
+        }
+    });
 }
