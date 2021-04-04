@@ -21,6 +21,7 @@ public class PuppyInfo implements Serializable {
     public String getName() {
         return name;
     }
+    public int getAge(){ return age; }
 
     public String getDistance(){
         return distance;
