@@ -1,2 +1,5 @@
+include ':mylibrary'
+include ':libDaumMapAndroid'
+include ':app:mylibrary'
 include ':app'
 rootProject.name = "My Application"
