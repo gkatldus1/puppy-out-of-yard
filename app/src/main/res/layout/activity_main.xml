@@ -23,7 +23,8 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            tools:ignore="MissingConstraints" />
+            android:background="@drawable/menu"
+            tools:ignore="MissingConstraints"/>
 
         <ListView
             android:id="@+id/lv_puppys"
