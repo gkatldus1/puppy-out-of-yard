@@ -60,6 +60,7 @@ public class SelectPuppyActivity extends AppCompatActivity implements ListViewAd
             }
         });
     }
+<<<<<<< HEAD
 
 
 
@@ -68,4 +69,8 @@ public class SelectPuppyActivity extends AppCompatActivity implements ListViewAd
 //    public void onListBtnClick(int position) {
 //        Toast.makeText(this, Integer.toString(position+1) + " Item is selected..", Toast.LENGTH_SHORT).show() ;
 //    }
-}
+=======
+
+
+
+
