@@ -9,9 +9,11 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 
 import net.daum.android.map.MapViewEventListener;
@@ -23,33 +25,33 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener {
-    Button btn_menu;
+    private Button btn_menu;
     private MapView mMapView;
-    ArrayList<PuppyInfo> li_PuppyInfo;
+    private ListView lv_puppys;
+
+    ArrayList<PuppyInfo> puppys;
 
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        btn_menu = findViewById(R.id.btn_menu);
-        btn_menu.setOnClickListener(this);
-
-        mMapView = (MapView) findViewById(R.id.map_view);
-        mMapView.setDaumMapApiKey(MapApiConst.DAUM_MAPS_ANDROID_APP_API_KEY);
-        mMapView.setMapViewEventListener(this);
-
+        viewInit();
         puppyInit();
-        getAppKeyHash();
+
+
+        // getAppKeyHash();
+
     }
+
+
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_menu:
                 Intent intent = new Intent(this, SelectPuppyActivity.class);
-                intent.putExtra("puppys", li_PuppyInfo);
+                intent.putExtra("puppys", puppys);
                 startActivity(intent);
                 break;
 
@@ -73,11 +75,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void viewInit() {
+        lv_puppys = findViewById(R.id.lv_puppys);
+        MainPuppyAdapter puppyAdapter = new MainPuppyAdapter(puppys);
+        lv_puppys.setAdapter(puppyAdapter);
+
+        btn_menu = findViewById(R.id.btn_menu);
+        btn_menu.setOnClickListener(this);
+
+        mMapView = (MapView) findViewById(R.id.map_view);
+        mMapView.setDaumMapApiKey(MapApiConst.DAUM_MAPS_ANDROID_APP_API_KEY);
+        mMapView.setMapViewEventListener(this);
+    }
+
     private void puppyInit(){
-        li_PuppyInfo = new ArrayList<PuppyInfo>();
-        li_PuppyInfo.add(new PuppyInfo("", 1, "함시연"));
-        li_PuppyInfo.add(new PuppyInfo("", 2, "함시염"));
-        li_PuppyInfo.add(new PuppyInfo("", 3, "함시욘"));
+        puppys = new ArrayList<PuppyInfo>();
+        puppys.add(new PuppyInfo("", 1, "함시연"));
+        puppys.add(new PuppyInfo("", 2, "함시염"));
+        puppys.add(new PuppyInfo("", 3, "함시욘"));
     }
 
     @Override

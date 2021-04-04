@@ -26,13 +26,13 @@
             tools:ignore="MissingConstraints" />
 
         <ListView
+            android:id="@+id/lv_puppys"
             android:layout_width="200dp"
             android:layout_height="200dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/cardview_dark_background"/>
+            android:layout_marginTop="10dp"/>
 
         <Button
             android:id="@+id/btn_my_position"
