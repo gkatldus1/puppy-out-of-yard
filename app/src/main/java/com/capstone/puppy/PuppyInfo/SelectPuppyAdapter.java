@@ -21,6 +21,10 @@ public class SelectPuppyAdapter extends BaseAdapter {
         puppy_count = puppys.size();
     }
 
+
+
+
+
     @Override
     public int getCount() {
         return puppy_count;
@@ -54,7 +58,7 @@ public class SelectPuppyAdapter extends BaseAdapter {
 //        ImageView tv_puppy_picture = (ImageView)view.findViewById(R.id.tv_puppy_picture);
 
         tv_puppy_name.setText(puppys.get(i).getName());
-        tv_puppy_age.setText(puppys.get(i).getAge());
+        tv_puppy_age.setText(puppys.get(i).getAge() + "");
 //        tv_puppy_picture.setImageDrawable(p);
 
         return view;
