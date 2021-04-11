@@ -39,6 +39,9 @@
         android:id="@+id/cb_puppy"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:text="CheckBox" />
+        android:text="CheckBox"
+        android:clickable="false"
+        android:focusable="false"
+        />
 
 </LinearLayout>

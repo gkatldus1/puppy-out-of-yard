@@ -2,12 +2,14 @@ package com.capstone.puppy;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
@@ -75,10 +77,36 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
                 puppys.remove(i);
             }
         }
+        puppyAdapter.setAllCheck(false);
         puppyAdapter.notifyDataSetChanged();
     }
-    public void onAddClick(){}
+    public void onAddClick(){
+
+        // 아이템 추가.
+
+        Intent intent = new Intent(this, AddPuppyActivity.class);
+        intent.putExtra("puppys", puppys);
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("selectpuppyActivity", "onActivityResult");
+        if (resultCode == RESULT_OK){
+            if (requestCode == 1){
+                PuppyInfo puppy =(PuppyInfo) data.getSerializableExtra("puppy");
+                puppys.add(puppy);
+                puppyAdapter.notifyDataSetChanged();
+
+            }
+
+        }
+    }
+
     public void onModifyClick(){}
+
+
 
 
     @Override

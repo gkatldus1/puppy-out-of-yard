@@ -91,9 +91,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void puppyInit(){
         puppys = new ArrayList<PuppyInfo>();
-        puppys.add(new PuppyInfo("", 1, "함시연"));
-        puppys.add(new PuppyInfo("", 2, "함시염"));
-        puppys.add(new PuppyInfo("", 3, "함시욘"));
+        puppys.add(new PuppyInfo("", "1", "함시연"));
+        puppys.add(new PuppyInfo("", "2", "함시염"));
+        puppys.add(new PuppyInfo("", "3", "함시욘"));
     }
 
     @Override

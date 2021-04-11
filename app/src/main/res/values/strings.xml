@@ -2,5 +2,6 @@
     <string name="app_name">My Application</string>
     <string name="title">추가</string>
     <string name="dog_s_profile_picture">Dog\'s profile picture</string>
-    <string name="profileInformation">Name</string>
+    <string name="sring_name">Name</string>
+    <string name="string_age">Age</string>
 </resources>

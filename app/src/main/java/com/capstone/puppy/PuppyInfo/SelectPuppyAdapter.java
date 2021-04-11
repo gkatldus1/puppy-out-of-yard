@@ -42,9 +42,14 @@ public class SelectPuppyAdapter extends BaseAdapter {
     public void setCheck(int position){
         mCheckArray[position] = !mCheckArray[position];
     }
+    public void setAllCheck(boolean value){
+        for(int i = 0; i < mCheckArray.length; i++){
+            mCheckArray[i] = value;
+        }
+    }
     @Override
     public int getCount() {
-        return puppy_count;
+        return puppys.size();
     }
 
     @Override

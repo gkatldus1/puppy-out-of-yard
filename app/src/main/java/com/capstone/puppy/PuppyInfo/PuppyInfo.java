@@ -4,14 +4,15 @@ import java.io.Serializable;
 
 public class PuppyInfo implements Serializable {
     private String ImageUrl;
-    private int age;
+    private String age;
     private String name;
     private String distance;
 
-    public PuppyInfo(String ImageUrl, int age, String name){
+    public PuppyInfo(String ImageUrl, String name, String age){
         this.ImageUrl = ImageUrl;
-        this.age = age;
         this.name = name;
+        this.age = age;
+
     }
 
     public void setDistance(String distance) {
@@ -21,7 +22,7 @@ public class PuppyInfo implements Serializable {
     public String getName() {
         return name;
     }
-    public int getAge(){ return age; }
+    public String getAge(){ return age; }
 
     public String getDistance(){
         return distance;

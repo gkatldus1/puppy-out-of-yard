@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AddPuppyActivity">
+    android:layout_width = "match_parent"
+    android:layout_height = "match_parent"
+    android:orientation="vertical">
 
 
-    <Button
-        android:id="@+id/btn_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/title"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.88" />
 
     <ImageView
-        android:id="@+id/iv_puppy"
+        android:id="@+id/image"
         android:layout_width="213dp"
         android:layout_height="319dp"
         android:layout_marginTop="84dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars"
-        android:contentDescription="@string/dog_s_profile_picture" />
+        android:contentDescription="@string/dog_s_profile_picture"
+        android:layout_gravity="center" />
 
-    <EditText
-        android:id="@+id/editTextTextPersonName"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="224dp"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="이름을 입력해주세요"
-        android:inputType="textPersonName"
-        android:text="@string/profileInformation"
-        app:layout_constraintBottom_toTopOf="@+id/btn_add"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="99dp"
+        tools:layout_editor_absoluteY="427dp"
+        android:layout_gravity="center">
 
+        <EditText
+            android:id="@+id/editName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="이름:"
+            android:inputType="textPersonName"
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_gravity="center"/>
+
+        <EditText
+            android:id="@+id/editAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="나이:"
+            android:inputType="textPersonName"
+
+            android:layout_gravity="center"/>
+
+        <Button
+            android:id="@+id/btn_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</LinearLayout>
