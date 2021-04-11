@@ -21,13 +21,10 @@ import java.util.ArrayList;
 
 
 public class SelectPuppyActivity extends AppCompatActivity implements View.OnClickListener   {
-
-    static final String[] LIST_MENU = {"LIST1", "LIST2", "LIST3"};
     Button btn_add, btn_mod, btn_del;
     private ListView lv_puppys_select;
     ArrayList<PuppyInfo> puppys;
     SelectPuppyAdapter puppyAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +47,8 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         lv_puppys_select.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                puppyAdapter.setCheck(position);
+                PuppyInfo puppy = (PuppyInfo)puppyAdapter.getItem(position);
+                puppy.setChecked(!puppy.getChecked());
                 puppyAdapter.notifyDataSetChanged();
             }
         });
@@ -63,27 +61,21 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         btn_add.setOnClickListener(this);
         btn_mod.setOnClickListener(this);
         btn_del.setOnClickListener(this);
-
-
-
     }
 
     //checkbox
     public void onDeleteClick(){
-        boolean bCheck;
         for(int i = puppyAdapter.getCount()-1; i>=0; i--){
-            bCheck = puppyAdapter.getChecked(i);
-            if(bCheck == true){
+            PuppyInfo puppy = (PuppyInfo)puppyAdapter.getItem(i);
+            if(puppy.getChecked()){
                 puppys.remove(i);
             }
         }
-        puppyAdapter.setAllCheck(false);
         puppyAdapter.notifyDataSetChanged();
     }
+
     public void onAddClick(){
-
         // 아이템 추가.
-
         Intent intent = new Intent(this, AddPuppyActivity.class);
         intent.putExtra("puppys", puppys);
         startActivityForResult(intent, 1);
@@ -92,7 +84,7 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("selectpuppyActivity", "onActivityResult");
+        Log.i("SelectPuppyActivity", "onActivityResult");
         if (resultCode == RESULT_OK){
             if (requestCode == 1){
                 PuppyInfo puppy =(PuppyInfo) data.getSerializableExtra("puppy");
@@ -100,14 +92,10 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
                 puppyAdapter.notifyDataSetChanged();
 
             }
-
         }
     }
 
     public void onModifyClick(){}
-
-
-
 
     @Override
     public void onClick(View v) {

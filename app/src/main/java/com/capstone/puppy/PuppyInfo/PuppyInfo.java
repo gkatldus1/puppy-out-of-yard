@@ -7,12 +7,13 @@ public class PuppyInfo implements Serializable {
     private String age;
     private String name;
     private String distance;
+    private boolean isChecked;
 
     public PuppyInfo(String ImageUrl, String name, String age){
         this.ImageUrl = ImageUrl;
         this.name = name;
         this.age = age;
-
+        isChecked = false;
     }
 
     public void setDistance(String distance) {
@@ -26,5 +27,12 @@ public class PuppyInfo implements Serializable {
 
     public String getDistance(){
         return distance;
+    }
+
+    public boolean getChecked(){
+        return isChecked;
+    }
+    public void setChecked(boolean isChecked){
+        this.isChecked = isChecked;
     }
 }

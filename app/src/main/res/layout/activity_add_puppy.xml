@@ -9,7 +9,7 @@
 
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/iv_thumnail"
         android:layout_width="213dp"
         android:layout_height="319dp"
         android:layout_marginTop="84dp"
@@ -26,7 +26,7 @@
         android:layout_gravity="center">
 
         <EditText
-            android:id="@+id/editName"
+            android:id="@+id/et_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -36,7 +36,7 @@
             android:layout_gravity="center"/>
 
         <EditText
-            android:id="@+id/editAge"
+            android:id="@+id/et_age"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"

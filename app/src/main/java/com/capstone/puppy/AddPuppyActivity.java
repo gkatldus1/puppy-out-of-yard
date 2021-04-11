@@ -14,47 +14,46 @@ import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import java.util.ArrayList;
 
 public class AddPuppyActivity extends AppCompatActivity implements View.OnClickListener {
-
     ImageView iv_puppy;
+    EditText et_name;
+    EditText et_age;
     Button btn_add;
-    String name;
-    ArrayList<PuppyInfo> puppys;
 
     @Override
     protected void onCreate(Bundle savedInstanceStat) {
         super.onCreate(savedInstanceStat);
         setContentView(R.layout.activity_add_puppy);
 
-        //강아지 추가 버튼 이벤트 리스너
+        //View 객체 와 ID 연결
+        iv_puppy = findViewById(R.id.iv_thumnail);
+        et_name = findViewById(R.id.et_name);
+        et_age = findViewById(R.id.et_age);
         btn_add = findViewById(R.id.btn_add);
+
+        //View 이벤트 등록
+        iv_puppy.setOnClickListener(this);
         btn_add.setOnClickListener(this);
-        //강아지 사진 추가 버튼 이벤트 리스너
-
     }
-
-
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             // 강아지 이름을 입력받고 저장하기.
             case R.id.btn_add:
+//                String puppy_image = iv_puppy;
+                String puppy_image = "";
+                String puppy_name =  et_name.getText().toString();
+                String puppy_age = et_age.getText().toString();
+                PuppyInfo puppy = new PuppyInfo(puppy_image, puppy_name, puppy_age);
+
                 Intent intent = getIntent();
-
-                ImageView image = (ImageView) findViewById(R.id.image);
-                EditText name = (EditText) findViewById(R.id.editName);
-                EditText age = (EditText) findViewById(R.id.editName);
-
-                //String puppy_image = image;
-                String puppy_name =  name.getText().toString();
-                String puppy_age = age.getText().toString();
-
-                PuppyInfo puppy = new PuppyInfo("", puppy_name, puppy_age);
                 intent.putExtra("puppy", puppy);
-                setResult(RESULT_OK,intent);
+                setResult(RESULT_OK, intent);
                 finish();
-                break;
 
+                break;
+            case R.id.iv_thumnail:
+                break;
         }
     }
 
