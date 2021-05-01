@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
+import com.capstone.puppy.Socket.GPSServer;
 
 import net.daum.android.map.MapViewEventListener;
 import net.daum.mf.map.api.MapPoint;
@@ -39,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         puppyInit();
         viewInit();
 
-
-
+        GPSServer server = new GPSServer();
+        server.start();
         // getAppKeyHash();
 
     }
