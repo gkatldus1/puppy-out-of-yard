@@ -18,6 +18,7 @@ import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.Socket.GPSServer;
 
 import net.daum.android.map.MapViewEventListener;
+import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
@@ -31,22 +32,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListView lv_puppys;
 
     ArrayList<PuppyInfo> puppys;
+    GPSServer server;
+    MapMarker mapMarker;
+
+    ProcessThread processThread;
 
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        puppyInit();
+        puppyInit(); //임시 리스트 추가
+        serverInit();
         viewInit();
+        mapAPIInit();
 
-        GPSServer server = new GPSServer();
-        server.start();
+        processThread = new ProcessThread();
+        processThread.start();
         // getAppKeyHash();
 
     }
-
-
 
     @Override
     public void onClick(View v) {
@@ -56,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("puppys", puppys);
                 startActivity(intent);
                 break;
-
         }
     }
 
@@ -77,6 +81,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void serverInit(){
+        server = new GPSServer();
+        server.start();
+    }
+
     private void viewInit() {
         lv_puppys = findViewById(R.id.lv_puppys);
         MainPuppyAdapter puppyAdapter = new MainPuppyAdapter(puppys);
@@ -88,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMapView = (MapView) findViewById(R.id.map_view);
         mMapView.setDaumMapApiKey(MapApiConst.DAUM_MAPS_ANDROID_APP_API_KEY);
         mMapView.setMapViewEventListener(this);
+    }
+
+    private void mapAPIInit(){
+        mapMarker = new MapMarker(mMapView);
     }
 
     private void puppyInit(){
@@ -131,4 +144,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onLoadMapView() {
 
     }
+
+    class ProcessThread extends Thread{
+        private final String TAG = "ProcessThread";
+
+        @Override
+        public void run() {
+            Log.i(TAG, "ProcessThread is Start");
+
+            while (true) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                PuppyInfo puppy = server.getDogPoints().get(0);
+                mapMarker.createCustomMarker(puppy);
+            }
+        }
+    };
 }

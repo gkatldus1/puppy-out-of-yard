@@ -7,6 +7,8 @@ public class PuppyInfo implements Serializable {
     private String age;
     private String name;
     private String distance;
+    private double x = 0;
+    private double y = 0;
     private boolean isChecked;
 
     public PuppyInfo(String ImageUrl, String name, String age){
@@ -34,5 +36,18 @@ public class PuppyInfo implements Serializable {
     }
     public void setChecked(boolean isChecked){
         this.isChecked = isChecked;
+    }
+
+    public void setPoint(double x, double y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public double getPointX(){
+        return x;
+    }
+
+    public double getPointY(){
+        return y;
     }
 }

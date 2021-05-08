@@ -2,12 +2,16 @@ package com.capstone.puppy.Socket;
 
 import android.util.Log;
 
+import com.capstone.puppy.PuppyInfo.PuppyInfo;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /*
@@ -15,10 +19,12 @@ header(byte)
     0 : cmd
     1 : gps data
 
- */
+*/
 public class GPSServer extends Thread{
     private static final String TAG = "GPSServer";
 
+    double x, y;
+    ArrayList<PuppyInfo> puppys;
 
     @Override
     public void run() {
@@ -38,6 +44,10 @@ public class GPSServer extends Thread{
                 DataOutputStream ops = new DataOutputStream(cs.getOutputStream());
                 receive_data = br.readLine();
                 Log.i(TAG, "receive data : " + receive_data);
+                String point = new String(receive_data);
+                String[] msg = point.split("/");
+                x = Double.parseDouble(msg[1]);
+                y = Double.parseDouble(msg[2]);
                 send_data = receive_data.toUpperCase() + '\n';
                 ops.write(send_data.getBytes());
 
@@ -51,5 +61,14 @@ public class GPSServer extends Thread{
     private void receiveDataParsing(Byte data[]){
         switch (data[0]){
         }
+    }
+
+    public List<PuppyInfo> getDogPoints(){
+        puppys = new ArrayList<PuppyInfo>();
+        PuppyInfo puppy = new PuppyInfo("", "1", "함시연");
+        puppy.setPoint(x, y);
+
+        puppys.add(puppy);
+        return puppys;
     }
 }
