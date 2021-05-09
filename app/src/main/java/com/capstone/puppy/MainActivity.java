@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void DBInit(){
-       DB data =  new DB();
+       DB data =  new DB(this);
        data.makeTable();
 
     }
