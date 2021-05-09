@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.capstone.puppy.PuppyInfo.GPSInfo;
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.Socket.GPSServer;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void serverInit(){
-        server = new GPSServer();
+        server = new GPSServer(puppys);
         server.start();
     }
 
@@ -105,9 +106,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void puppyInit(){
         puppys = new ArrayList<PuppyInfo>();
-        puppys.add(new PuppyInfo("", "1", "함시연"));
-        puppys.add(new PuppyInfo("", "2", "함시염"));
-        puppys.add(new PuppyInfo("", "3", "함시욘"));
+        puppys.add(new PuppyInfo(1, "url1", "함시연", "18"));
+        puppys.add(new PuppyInfo(2, "url2", "함시염", "1818"));
+        puppys.add(new PuppyInfo(3, "url3", "함시욘", "181818"));
     }
 
     @Override
@@ -158,8 +159,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                PuppyInfo puppy = server.getDogPoints().get(0);
-                mapMarker.createCustomMarker(puppy);
+
+                for(PuppyInfo puppyInfo:server.getDogPoints())
+                    for(GPSInfo gpsInfo:puppyInfo.getGpsInfos()){
+                        mapMarker.createCustomMarker(gpsInfo.getMapPoint());
+                    }
             }
         }
     };

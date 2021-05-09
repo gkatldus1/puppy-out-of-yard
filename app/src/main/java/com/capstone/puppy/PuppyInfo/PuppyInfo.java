@@ -1,25 +1,33 @@
 package com.capstone.puppy.PuppyInfo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PuppyInfo implements Serializable {
+    private int id;
     private String ImageUrl;
     private String age;
     private String name;
     private String distance;
-    private double x = 0;
-    private double y = 0;
+    private List<GPSInfo> gpsInfos;
     private boolean isChecked;
 
-    public PuppyInfo(String ImageUrl, String name, String age){
+    public PuppyInfo(int id, String ImageUrl, String name, String age){
+        this.id = id;
         this.ImageUrl = ImageUrl;
         this.name = name;
         this.age = age;
         isChecked = false;
+        gpsInfos = new ArrayList<GPSInfo>();
     }
 
     public void setDistance(String distance) {
         this.distance = distance;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public String getName() {
@@ -38,16 +46,13 @@ public class PuppyInfo implements Serializable {
         this.isChecked = isChecked;
     }
 
-    public void setPoint(double x, double y){
-        this.x = x;
-        this.y = y;
+    public void addGPSPoint(double x, double y){
+        GPSInfo gpsInfo = new GPSInfo();
+        gpsInfo.setPosition(x, y);
+        gpsInfos.add(gpsInfo);
     }
 
-    public double getPointX(){
-        return x;
-    }
-
-    public double getPointY(){
-        return y;
+    public List<GPSInfo> getGpsInfos(){
+        return gpsInfos;
     }
 }

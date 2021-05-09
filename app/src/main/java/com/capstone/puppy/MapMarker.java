@@ -11,9 +11,6 @@ import net.daum.mf.map.api.MapView;
 
 public class MapMarker {
     private static final String TAG = "GPSServer";
-    private static final MapPoint CUSTOM_MARKER_POINT = MapPoint.mapPointWithGeoCoord(37.537229, 127.005515);
-    private static final MapPoint CUSTOM_MARKER_POINT2 = MapPoint.mapPointWithGeoCoord(37.447229, 127.015515);
-    private static final MapPoint DEFAULT_MARKER_POINT = MapPoint.mapPointWithGeoCoord(37.4020737, 127.1086766);
 
     MapView mapview;
     MapPOIItem mCustomMarker;
@@ -25,20 +22,12 @@ public class MapMarker {
         mCustomMarker = new MapPOIItem();
     }
 
-    public void createCustomMarker(PuppyInfo puppy) {
-        double x = puppy.getPointX();
-        double y = puppy.getPointY();
-        if(x ==0 || y == 0)
-            return;
-
-        Log.i(TAG, "위도 : " + x + " 경도 : " + y);
-        MapPoint point =  MapPoint.mapPointWithGeoCoord(x, y);
-
+    public void createCustomMarker(MapPoint mapPoint) {
         mCustomMarker = new MapPOIItem();
         String name = "Custom Marker";
         mCustomMarker.setItemName(name);
         mCustomMarker.setTag(1);
-        mCustomMarker.setMapPoint(point);
+        mCustomMarker.setMapPoint(mapPoint);
 
         mCustomMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
 
@@ -48,6 +37,6 @@ public class MapMarker {
 
         mapview.addPOIItem(mCustomMarker);
         mapview.selectPOIItem(mCustomMarker, true);
-        mapview.setMapCenterPoint(point, false);
+        mapview.setMapCenterPoint(mapPoint, false);
     }
 }

@@ -44,7 +44,7 @@ public class AddPuppyActivity extends AppCompatActivity implements View.OnClickL
                 String puppy_image = "";
                 String puppy_name =  et_name.getText().toString();
                 String puppy_age = et_age.getText().toString();
-                PuppyInfo puppy = new PuppyInfo(puppy_image, puppy_name, puppy_age);
+                PuppyInfo puppy = new PuppyInfo(0, puppy_image, puppy_name, puppy_age);
 
                 Intent intent = getIntent();
                 intent.putExtra("puppy", puppy);
