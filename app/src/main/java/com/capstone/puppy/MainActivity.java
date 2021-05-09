@@ -16,9 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.Socket.GPSServer;
+import com.capstone.puppy.util.DB;
 
 import net.daum.android.map.MapViewEventListener;
-import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         serverInit();
         viewInit();
         mapAPIInit();
+        DBInit();
 
         processThread = new ProcessThread();
         processThread.start();
@@ -80,6 +81,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.e("name not found", e.toString());
         }
     }
+
+    private void DBInit(){
+       DB data =  new DB();
+       data.makeTable();
+
+    }
+
 
     private void serverInit(){
         server = new GPSServer();
