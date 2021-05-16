@@ -7,19 +7,17 @@ import android.util.Log;
 
 import java.io.File;
 
-import static android.os.ParcelFileDescriptor.MODE_WORLD_WRITEABLE;
+public class DogeDB{
+    public final static String TAG = "DogeDB";
+    static Context context;
 
-public class DB {
-    public final static String TAG = "DB";
-    Context context;
-
-    public DB(Context context){
-        this.context = context;
+    public static void setDogeContext(Context mcontext){
+        context = mcontext;
     }
 
-    SQLiteDatabase sqliteDB = null;
+    static SQLiteDatabase sqliteDB = null;
 
-    public void makeTable(){
+    public static void makeTable(){
 
         try{
             File db_file = context.getDatabasePath("Doge.db");
@@ -34,7 +32,26 @@ public class DB {
         String sqlCreateTb2 = "CREATE TABLE IF NOT EXISTS  GPS_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, x REAL, y REAL, time TEXT not null DEFAULT (datetime('now', 'localtime')));";
         sqliteDB.execSQL(sqlCreateTb1);
         sqliteDB.execSQL(sqlCreateTb2);
+    }
+    public static void insertRecord(String dbName, String p_name, String p_age ){
+        Log.i(TAG, "insertRecord()");
+        String sql = "insert into " + dbName + " (name, age) values ('" + p_name + "','" + p_age + "');";
+        Log.i(TAG, "sql : " + sql);
+        sqliteDB.execSQL(sql);
+    }
 
+//    public static void selectRecord(){
+//        Cursor c1 = sqliteDB.rawQuery
+//    }
+
+    public static  void insertGps(String x_pos, String y_pos){
+        Log.i(TAG, "insertGps()");
+        String sql = "insert into " + "GPS_INFO" + " (x, y) values ('" + x_pos +"','" + y_pos + "');";
+        sqliteDB.execSQL(sql);
 
     }
+
+
+
+
 }
