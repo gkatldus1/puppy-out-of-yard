@@ -11,13 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 
-import java.util.ArrayList;
-
 public class AddPuppyActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView iv_puppy;
     EditText et_name;
     EditText et_age;
     Button btn_add;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceStat) {

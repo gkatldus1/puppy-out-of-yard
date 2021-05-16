@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.PuppyInfo.SelectPuppyAdapter;
+import com.capstone.puppy.util.DogeDB;
 
 import java.util.ArrayList;
 
@@ -77,8 +78,9 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
     public void onAddClick(){
         // 아이템 추가.
         Intent intent = new Intent(this, AddPuppyActivity.class);
-        intent.putExtra("puppys", puppys);
+        intent.putExtra("puppys", puppys);//데이터 보내주는 코드
         startActivityForResult(intent, 1);
+
     }
 
     @Override
@@ -88,11 +90,13 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         if (resultCode == RESULT_OK){
             if (requestCode == 1){
                 PuppyInfo puppy =(PuppyInfo) data.getSerializableExtra("puppy");
+                DogeDB.insertRecord("DOG_INFO", puppy.getName(), puppy.getAge());
                 puppys.add(puppy);
                 puppyAdapter.notifyDataSetChanged();
 
             }
         }
+
     }
 
     public void onModifyClick(){}
