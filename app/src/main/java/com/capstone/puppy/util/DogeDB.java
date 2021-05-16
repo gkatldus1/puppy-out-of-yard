@@ -29,7 +29,7 @@ public class DogeDB{
         }
 
         String sqlCreateTb1 = "CREATE TABLE IF NOT EXISTS  DOG_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT(20) NOT NULL, age INTEGER NOT NULL);";
-        String sqlCreateTb2 = "CREATE TABLE IF NOT EXISTS  GPS_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, x REAL, y REAL, time TEXT not null DEFAULT (datetime('now', 'localtime')));";
+        String sqlCreateTb2 = "CREATE TABLE IF NOT EXISTS  GPS_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, x double, y double, time TEXT not null DEFAULT (datetime('now', 'localtime')));";
         sqliteDB.execSQL(sqlCreateTb1);
         sqliteDB.execSQL(sqlCreateTb2);
     }
@@ -44,7 +44,7 @@ public class DogeDB{
 //        Cursor c1 = sqliteDB.rawQuery
 //    }
 
-    public static  void insertGps(String x_pos, String y_pos){
+    public static  void insertGps(double x_pos, double y_pos){
         Log.i(TAG, "insertGps()");
         String sql = "insert into " + "GPS_INFO" + " (x, y) values ('" + x_pos +"','" + y_pos + "');";
         sqliteDB.execSQL(sql);

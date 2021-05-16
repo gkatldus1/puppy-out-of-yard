@@ -167,7 +167,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
                 PuppyInfo puppy = server.getDogPoints().get(0);
+                //double gps_x_info = new Double(puppy.getPointX());
+                //double gps_y_info = new Double(puppy.getPointY());
+                DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
                 mapMarker.createCustomMarker(puppy);
+
             }
         }
     };
