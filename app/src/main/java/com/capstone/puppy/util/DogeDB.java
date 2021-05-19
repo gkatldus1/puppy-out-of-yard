@@ -1,11 +1,16 @@
 package com.capstone.puppy.util;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import com.capstone.puppy.PuppyInfo.GpsInfo;
+import com.capstone.puppy.PuppyInfo.PuppyInfo;
+
 import java.io.File;
+import java.util.ArrayList;
 
 public class DogeDB{
     public final static String TAG = "DogeDB";
@@ -28,7 +33,7 @@ public class DogeDB{
             e.printStackTrace();
         }
 
-        String sqlCreateTb1 = "CREATE TABLE IF NOT EXISTS  DOG_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT(20) NOT NULL, age INTEGER NOT NULL);";
+        String sqlCreateTb1 = "CREATE TABLE IF NOT EXISTS  DOG_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT(20) NOT NULL, age TEXT(20) NOT NULL);";
         String sqlCreateTb2 = "CREATE TABLE IF NOT EXISTS  GPS_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, x double, y double, time TEXT not null DEFAULT (datetime('now', 'localtime')));";
         sqliteDB.execSQL(sqlCreateTb1);
         sqliteDB.execSQL(sqlCreateTb2);
@@ -40,9 +45,34 @@ public class DogeDB{
         sqliteDB.execSQL(sql);
     }
 
-//    public static void selectRecord(){
-//        Cursor c1 = sqliteDB.rawQuery
-//    }
+    public static ArrayList<PuppyInfo> selectDogRecord(){
+        Cursor cursor= sqliteDB.rawQuery("select * from DOG_INFO", null);
+        ArrayList<PuppyInfo> puppys = new ArrayList<>();
+        cursor.moveToFirst();
+        puppys.add(new PuppyInfo(cursor.getString(1), cursor.getString(2)));
+        while (cursor.moveToNext()){
+            puppys.add(new PuppyInfo(cursor.getString(1), cursor.getString(2)));
+        }
+        return puppys;
+    }
+
+    public static ArrayList<GpsInfo> selectGpsRecord(){
+
+        Cursor ID_NUM = sqliteDB.rawQuery("select count(id) from GPS_INFO", null);
+        int id_num = ID_NUM.getInt(0);
+        int start = id_num - 10;
+        Cursor cursor = sqliteDB.rawQuery("select * from GPS_INFO where id >= start and id<= id_num", null);
+        cursor.moveToFirst();
+        ArrayList<GpsInfo> gps = new ArrayList<>();
+        gps.add(new GpsInfo(cursor.getDouble(1), cursor.getDouble(2)));
+        while(cursor.moveToNext()){
+            gps.add(new GpsInfo(cursor.getDouble(1), cursor.getDouble(2)));
+        }
+
+        return gps;
+
+
+    }
 
     public static  void insertGps(double x_pos, double y_pos){
         Log.i(TAG, "insertGps()");
@@ -50,8 +80,5 @@ public class DogeDB{
         sqliteDB.execSQL(sql);
 
     }
-
-
-
 
 }

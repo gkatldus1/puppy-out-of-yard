@@ -2,6 +2,7 @@ package com.capstone.puppy.Socket;
 
 import android.util.Log;
 
+import com.capstone.puppy.PuppyInfo.GpsInfo;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 
 import java.io.BufferedReader;
@@ -66,7 +67,7 @@ public class GPSServer extends Thread{
     public List<PuppyInfo> getDogPoints(){
         puppys = new ArrayList<PuppyInfo>();
         PuppyInfo puppy = new PuppyInfo("", "1", "함시연");
-        puppy.setPoint(x, y);
+        puppy.GpsAdd(new GpsInfo(x, y));
 
         puppys.add(puppy);
         return puppys;

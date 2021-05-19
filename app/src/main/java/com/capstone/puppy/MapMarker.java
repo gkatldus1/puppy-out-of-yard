@@ -3,7 +3,7 @@ package com.capstone.puppy;
 import android.util.Log;
 import android.view.View;
 
-import com.capstone.puppy.PuppyInfo.PuppyInfo;
+import com.capstone.puppy.PuppyInfo.GpsInfo;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -25,9 +25,10 @@ public class MapMarker {
         mCustomMarker = new MapPOIItem();
     }
 
-    public void createCustomMarker(PuppyInfo puppy) {
-        double x = puppy.getPointX();
-        double y = puppy.getPointY();
+    public void createCustomMarker(GpsInfo gps) {
+
+        double x = gps.getPointX();
+        double y = gps.getPointY();
         if(x ==0 || y == 0)
             return;
 

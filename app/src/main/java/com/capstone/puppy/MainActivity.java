@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.capstone.puppy.PuppyInfo.GpsInfo;
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.Socket.GPSServer;
@@ -166,12 +167,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                PuppyInfo puppy = server.getDogPoints().get(0);
+                //PuppyInfo puppy = server.getDogPoints().get(0);
                 //double gps_x_info = new Double(puppy.getPointX());
                 //double gps_y_info = new Double(puppy.getPointY());
-                DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
-                mapMarker.createCustomMarker(puppy);
 
+                //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
+                ArrayList<GpsInfo> gps = DogeDB.selectGpsRecord();
+                for(GpsInfo one : gps) {
+                    mapMarker.createCustomMarker(one);
+                }
             }
         }
     };
