@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.GPSInfo;
@@ -26,8 +27,10 @@ import net.daum.mf.map.api.MapView;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener {
+    private final String TAG = "MainActivity";
     private Button btn_menu;
     private MapView mMapView;
     private ListView lv_puppys;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     GPSServer server;
     MapMarker mapMarker;
 
+    MainPuppyAdapter puppyAdapter;
+
     ProcessThread processThread;
 
     @SuppressLint("WrongViewCast")
@@ -43,11 +48,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        puppyInit(); //임시 리스트 추가
-        serverInit();
+        DBInit();
+        //serverInit();
         viewInit();
         mapAPIInit();
-        DBInit();
 
         processThread = new ProcessThread();
         processThread.start();
@@ -61,8 +65,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_menu:
                 Intent intent = new Intent(this, SelectPuppyActivity.class);
                 intent.putExtra("puppys", puppys);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i(TAG, "onActivityResult");
+        Log.i(TAG, "RESULT:" + resultCode);
+        Log.i(TAG, "REQUEST:" + requestCode);
+        if(data == null)
+            return;
+
+        if (resultCode == RESULT_OK){
+            if (requestCode == 1){
+                ArrayList<PuppyInfo> new_puppys_temp = (ArrayList<PuppyInfo>) data.getSerializableExtra("added_puppys");
+                for(PuppyInfo puppy : new_puppys_temp) {
+                    DogeDB.insertRecord("DOG_INFO", puppy.getName(), puppy.getAge());
+                    puppys.add(puppy);
+                    Log.i(TAG, "add puppy complete");
+                }
+                puppyAdapter.notifyDataSetChanged();
+                Log.i(TAG, "puppy ui update");
+            }
         }
     }
 
@@ -86,9 +113,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void DBInit(){
        DogeDB.setDogeContext(this);
        DogeDB.makeTable();
-
+       //puppys = DogeDB.getPuppysInfo();
+        puppys = puppyInit(); //임시로 넣음
     }
 
+    
 
     private void serverInit(){
         server = new GPSServer(puppys);
@@ -97,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void viewInit() {
         lv_puppys = findViewById(R.id.lv_puppys);
-        MainPuppyAdapter puppyAdapter = new MainPuppyAdapter(puppys);
+        puppyAdapter = new MainPuppyAdapter(puppys);
         lv_puppys.setAdapter(puppyAdapter);
 
         btn_menu = findViewById(R.id.btn_menu);
@@ -112,11 +141,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapMarker = new MapMarker(mMapView);
     }
 
-    private void puppyInit(){
-        puppys = new ArrayList<PuppyInfo>();
-        puppys.add(new PuppyInfo("", "1", "아람"));
-        puppys.add(new PuppyInfo("", "2", "해피"));
-        puppys.add(new PuppyInfo("", "3", "초코"));
+    private ArrayList<PuppyInfo> puppyInit(){
+        ArrayList<PuppyInfo> temp_puppys = new ArrayList<PuppyInfo>();
+
+        temp_puppys.add(new PuppyInfo(1, "image/1.png", "테슬라", "589달러"));
+        temp_puppys.add(new PuppyInfo(2, "image/1.png", "일론", "49세"));
+        temp_puppys.add(new PuppyInfo(3, "image/2.png", "머스크", "49세"));
+        temp_puppys.add(new PuppyInfo(4, "image/3.png", "도지", "550층"));
+        temp_puppys.add(new PuppyInfo(5, "image/3.png", "화성", "4603000000년"));
+        temp_puppys.add(new PuppyInfo(6, "image/3.png", "가즈아", "700층"));
+
+        return temp_puppys;
     }
 
     @Override
@@ -167,11 +202,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                PuppyInfo puppy = server.getDogPoints().get(0);
+                //PuppyInfo puppy = server.getDogPoints().get(0);
                 //double gps_x_info = new Double(puppy.getPointX());
                 //double gps_y_info = new Double(puppy.getPointY());
-                DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
-                mapMarker.createCustomMarker(puppy);
+                //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
+                //mapMarker.createCustomMarker(puppy);
 
             }
         }

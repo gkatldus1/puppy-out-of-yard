@@ -3,12 +3,14 @@ package com.capstone.puppy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,14 +20,28 @@ import com.capstone.puppy.util.DogeDB;
 
 import java.util.ArrayList;
 
-
-
-
 public class SelectPuppyActivity extends AppCompatActivity implements View.OnClickListener   {
+    private final String TAG = "SelectPuppyActivity";
     Button btn_add, btn_mod, btn_del;
     private ListView lv_puppys_select;
     ArrayList<PuppyInfo> puppys;
+    ArrayList<PuppyInfo> added_puppys = null;
     SelectPuppyAdapter puppyAdapter;
+
+    @Override
+    public void onBackPressed(){
+        Log.i(TAG, "onBackPressed()");
+        if(added_puppys == null){
+            Log.i(TAG, "Added_Puppy is null");
+        }else{
+            Intent intent = getIntent();
+            intent.putExtra("puppys", puppys);
+            Log.i(TAG, "Added_Puppy is not null");
+            intent.putExtra("added_puppys", added_puppys);
+            setResult(RESULT_OK, intent);
+        }
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,17 +102,31 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("SelectPuppyActivity", "onActivityResult");
+        Log.i(TAG, "onActivityResult");
         if (resultCode == RESULT_OK){
             if (requestCode == 1){
-                PuppyInfo puppy =(PuppyInfo) data.getSerializableExtra("puppy");
-                DogeDB.insertRecord("DOG_INFO", puppy.getName(), puppy.getAge());
+                String url = data.getStringExtra("url");
+                String name = data.getStringExtra("name");
+                String age = data.getStringExtra("age");
+
+                Log.i(TAG, "intent data:" + url + " " + name + " " + age);
+                int id = 0;
+                for(int i = 0; i < puppys.size(); i++){
+                    if( id < puppys.get(i).getId())
+                        id = puppys.get(i).getId();
+                }
+                PuppyInfo puppy = new PuppyInfo(id+1, url, name, age);
                 puppys.add(puppy);
                 puppyAdapter.notifyDataSetChanged();
 
+                if(added_puppys == null) {
+                    added_puppys = new ArrayList<>();
+                    Log.i(TAG, "added_puppy new instance");
+                }
+                added_puppys.add(puppy);
+                Log.i(TAG, "added_puppy added");
             }
         }
-
     }
 
     public void onModifyClick(){}

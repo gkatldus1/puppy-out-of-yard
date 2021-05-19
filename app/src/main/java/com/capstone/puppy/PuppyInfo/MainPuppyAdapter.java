@@ -15,16 +15,14 @@ import java.util.ArrayList;
 public class MainPuppyAdapter extends BaseAdapter {
     private ArrayList<PuppyInfo> puppys = null;
     LayoutInflater inflater = null;
-    private int puppy_count = 0;
 
     public MainPuppyAdapter(ArrayList<PuppyInfo> puppys){
         this.puppys = puppys;
-        puppy_count = puppys.size();
     }
 
     @Override
     public int getCount() {
-        return puppy_count;
+        return puppys.size();
     }
 
     @Override

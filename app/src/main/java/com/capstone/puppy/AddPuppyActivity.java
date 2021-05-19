@@ -40,13 +40,14 @@ public class AddPuppyActivity extends AppCompatActivity implements View.OnClickL
             // 강아지 이름을 입력받고 저장하기.
             case R.id.btn_add:
 //                String puppy_image = iv_puppy;
-                String puppy_image = "";
+                String puppy_image = "temp";
                 String puppy_name =  et_name.getText().toString();
                 String puppy_age = et_age.getText().toString();
-                PuppyInfo puppy = new PuppyInfo(0, puppy_image, puppy_name, puppy_age);
 
                 Intent intent = getIntent();
-                intent.putExtra("puppy", puppy);
+                intent.putExtra("url", puppy_image);
+                intent.putExtra("name", puppy_name);
+                intent.putExtra("age", puppy_age);
                 setResult(RESULT_OK, intent);
                 finish();
 
@@ -55,9 +56,4 @@ public class AddPuppyActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
     }
-
-
-//잠깐 수정해봄
-
-
 }

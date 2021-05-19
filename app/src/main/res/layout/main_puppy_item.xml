@@ -12,10 +12,12 @@
     <TextView
         android:id="@+id/tv_puppy_name"
         android:layout_width="100dp"
-        android:layout_height="30dp" />
+        android:layout_height="30dp"
+        android:textColor="@color/black"/>
 
     <TextView
         android:id="@+id/tv_puppy_distance"
         android:layout_width="100dp"
-        android:layout_height="30dp"/>
+        android:layout_height="30dp"
+        android:textColor="@color/black"/>
 </LinearLayout>

@@ -18,7 +18,6 @@ public class DogeDB{
     static SQLiteDatabase sqliteDB = null;
 
     public static void makeTable(){
-
         try{
             File db_file = context.getDatabasePath("Doge.db");
             sqliteDB = SQLiteDatabase.openOrCreateDatabase(db_file, null);
@@ -33,6 +32,8 @@ public class DogeDB{
         sqliteDB.execSQL(sqlCreateTb1);
         sqliteDB.execSQL(sqlCreateTb2);
     }
+
+
     public static void insertRecord(String dbName, String p_name, String p_age ){
         Log.i(TAG, "insertRecord()");
         String sql = "insert into " + dbName + " (name, age) values ('" + p_name + "','" + p_age + "');";
@@ -50,8 +51,4 @@ public class DogeDB{
         sqliteDB.execSQL(sql);
 
     }
-
-
-
-
 }

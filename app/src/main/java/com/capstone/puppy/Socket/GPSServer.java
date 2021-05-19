@@ -15,7 +15,6 @@ import java.util.List;
 header(byte)
     0 : cmd
     1 : gps data
-
 */
 public class GPSServer extends Thread{
     private static final String TAG = "GPSServer";
