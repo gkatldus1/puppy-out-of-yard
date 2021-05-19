@@ -1,20 +1,23 @@
 package com.capstone.puppy.PuppyInfo;
 
+public class GPSInfo{
+    private double x = 0;
+    private double y = 0;
 
-import net.daum.mf.map.api.MapPoint;
-
-import java.util.Date;
-
-public class GPSInfo {
-    private MapPoint mapPoint;
-    private Date date;
-
-    public void setPosition(double lat, double lon){
-        mapPoint = MapPoint.mapPointWithGeoCoord(lat, lon);
-        date = new Date(System.currentTimeMillis());
+    public GPSInfo(double x, double y){
+        this.x = x;
+        this.y = y;
+    }
+    public void setPoint(double x, double y){
+        this.x = x;
+        this.y = y;
     }
 
-    public MapPoint getMapPoint(){
-        return mapPoint;
+    public double getPointX(){
+        return x;
+    }
+
+    public double getPointY(){
+        return y;
     }
 }

@@ -197,18 +197,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i(TAG, "ProcessThread is Start");
 
             while (true) {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 //PuppyInfo puppy = server.getDogPoints().get(0);
                 //double gps_x_info = new Double(puppy.getPointX());
                 //double gps_y_info = new Double(puppy.getPointY());
                 //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
                 //mapMarker.createCustomMarker(puppy);
 
+                //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
+                ArrayList<GPSInfo> gps = DogeDB.selectGpsRecord();
+                for(GPSInfo one : gps) {
+                    mapMarker.createCustomMarker(one);
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
-    };
+    }
 }

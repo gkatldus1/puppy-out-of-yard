@@ -1,7 +1,6 @@
 package com.capstone.puppy.Socket;
 
 import android.util.Log;
-
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 
 import java.io.IOException;
@@ -43,25 +42,5 @@ public class GPSServer extends Thread{
         }catch (IOException e){
             e.printStackTrace();
         }
-    }
-
-    public List<PuppyInfo> getDogPoints(){
-        List<PuppyInfo> puppys = new ArrayList<PuppyInfo>();
-
-
-        for(ReceiveThread thread:receiveThreads){
-            boolean isNewDog = true;
-            for(PuppyInfo puppy: puppys){
-                if(puppy.getId() == thread.getId()){
-                    puppy.addGPSPoint(thread.getLat(), thread.getLon());
-                    isNewDog = false;
-                    break;
-                }
-            }
-            if(isNewDog)
-                puppys.add(new PuppyInfo(thread.getPuppyId(), "url", "name", "18"));
-        }
-
-        return puppys;
     }
 }
