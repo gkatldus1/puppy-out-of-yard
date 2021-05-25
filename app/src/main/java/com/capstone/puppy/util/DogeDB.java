@@ -60,9 +60,13 @@ public class DogeDB{
     public static ArrayList<GPSInfo> selectGpsRecord(){
 
         Cursor ID_NUM = sqliteDB.rawQuery("select count(id) from GPS_INFO", null);
+        ID_NUM.moveToFirst();
         int id_num = ID_NUM.getInt(0);
         int start = id_num - 10;
-        Cursor cursor = sqliteDB.rawQuery("select * from GPS_INFO where id >= start and id<= id_num", null);
+        id_num = 10;
+        start = 1;
+
+        Cursor cursor = sqliteDB.rawQuery("select * from GPS_INFO where id >="+ start + " and id<=" + id_num , null);
         cursor.moveToFirst();
         ArrayList<GPSInfo> gps = new ArrayList<>();
 

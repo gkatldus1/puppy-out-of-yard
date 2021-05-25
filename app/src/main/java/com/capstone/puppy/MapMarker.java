@@ -26,10 +26,10 @@ public class MapMarker {
 
         double x = gps.getPointX();
         double y = gps.getPointY();
+        Log.i(TAG, "위도 : " + x + " 경도 : " + y);
         if(x ==0 || y == 0)
             return;
 
-        Log.i(TAG, "위도 : " + x + " 경도 : " + y);
         MapPoint point =  MapPoint.mapPointWithGeoCoord(x, y);
 
         mCustomMarker = new MapPOIItem();
