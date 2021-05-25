@@ -1,23 +1,25 @@
 package com.capstone.puppy.PuppyInfo;
 
 public class GPSInfo{
-    private double x = 0;
-    private double y = 0;
+    private double lat = 0;
+    private double lon = 0;
+    private String date = "";
 
-    public GPSInfo(double x, double y){
-        this.x = x;
-        this.y = y;
-    }
-    public void setPoint(double x, double y){
-        this.x = x;
-        this.y = y;
+    public GPSInfo(double lat, double lon, String date){
+        this.lat = lat;
+        this.lon = lon;
+        this.date = date;
     }
 
-    public double getPointX(){
-        return x;
+    public double getLat(){
+        return lat;
     }
 
-    public double getPointY(){
-        return y;
+    public double getLon(){
+        return lon;
+    }
+
+    public String getDate(){
+        return date;
     }
 }

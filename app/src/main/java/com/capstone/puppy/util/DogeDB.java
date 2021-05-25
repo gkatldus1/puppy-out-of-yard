@@ -71,7 +71,7 @@ public class DogeDB{
         ArrayList<GPSInfo> gps = new ArrayList<>();
 
         do{
-            gps.add(new GPSInfo(cursor.getDouble(1), cursor.getDouble(2)));
+            gps.add(new GPSInfo(cursor.getDouble(1), cursor.getDouble(2), cursor.getString(3)));
         }while(cursor.moveToNext());
 
         return gps;

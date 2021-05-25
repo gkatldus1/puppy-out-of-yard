@@ -13,7 +13,7 @@ public class PuppyInfo implements Serializable {
     private boolean isChecked;
     ArrayList<GPSInfo> gps;
 
-    public void GpsAdd(GPSInfo gps){
+    public void GpsAdd(GPSInfo gps) {
         this.gps.add(gps);
     }
 
@@ -23,6 +23,8 @@ public class PuppyInfo implements Serializable {
         this.name = name;
         this.age = age;
         isChecked = false;
+        if(gps == null)
+            gps = new ArrayList<GPSInfo>();
     }
 
     public PuppyInfo(String name, String age) {
@@ -34,7 +36,7 @@ public class PuppyInfo implements Serializable {
         this.distance = distance;
     }
 
-    public int getId(){
+    public int getId() {
         return id;
     }
 
@@ -58,12 +60,27 @@ public class PuppyInfo implements Serializable {
         this.isChecked = isChecked;
     }
 
-    public void addGPSPoint(double x, double y){
-        GPSInfo gpsInfo = new GPSInfo(x, y);
-        gps.add(gpsInfo);
+    public boolean addGPSInfo(GPSInfo gpsInfo){
+        GPSInfo lastInfo;
+        if(gps.size() <= 0) {
+            gps.add(gpsInfo);
+            return true;
+        }
+
+        lastInfo = gps.get(gps.size()-1);
+        if(lastInfo.getLat() == gpsInfo.getLat() && lastInfo.getLon() == gpsInfo.getLon())
+            return false;
+        else {
+            gps.add(gpsInfo);
+            return true;
+        }
     }
 
-    public List<GPSInfo> getGpsInfos(){
+    public ArrayList<GPSInfo> getGpsInfos(){
         return gps;
+    }
+
+    public void setGpsInfos(){
+
     }
 }

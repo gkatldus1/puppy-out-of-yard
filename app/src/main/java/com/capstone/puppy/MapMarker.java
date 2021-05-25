@@ -11,7 +11,8 @@ import net.daum.mf.map.api.MapView;
 
 public class MapMarker {
     private static final String TAG = "GPSServer";
-
+    double lat = 0;
+    double lon = 0;
     MapView mapview;
     MapPOIItem mCustomMarker;
 
@@ -23,14 +24,18 @@ public class MapMarker {
     }
 
     public void createCustomMarker(GPSInfo gps) {
+        double lat = gps.getLat();
+        double lon = gps.getLon();
 
-        double x = gps.getPointX();
-        double y = gps.getPointY();
-        Log.i(TAG, "위도 : " + x + " 경도 : " + y);
-        if(x ==0 || y == 0)
+        if(this.lat == lat && this.lon == lon)
             return;
 
-        MapPoint point =  MapPoint.mapPointWithGeoCoord(x, y);
+        Log.i(TAG, "위도 : " + lat + " 경도 : " + lon);
+
+        if(lat ==0 || lon == 0)
+            return;
+
+        MapPoint point =  MapPoint.mapPointWithGeoCoord(lat, lon);
 
         mCustomMarker = new MapPOIItem();
         String name = "Custom Marker";

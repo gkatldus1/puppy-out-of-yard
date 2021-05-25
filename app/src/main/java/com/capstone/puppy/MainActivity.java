@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DBInit();
-        //serverInit();
+        serverInit();
         viewInit();
         mapAPIInit();
 
@@ -190,29 +190,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     class ProcessThread extends Thread{
         private final String TAG = "ProcessThread";
-
+        PuppyInfo puppyInfo;
         @Override
         public void run() {
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             Log.i(TAG, "ProcessThread is Start");
 
-            while (true) {
-                //PuppyInfo puppy = server.getDogPoints().get(0);
-                //double gps_x_info = new Double(puppy.getPointX());
-                //double gps_y_info = new Double(puppy.getPointY());
-                //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
-                //mapMarker.createCustomMarker(puppy);
+            puppyInfo = puppys.get(0);
 
-                //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
-                ArrayList<GPSInfo> gps = DogeDB.selectGpsRecord();
-                Log.i(TAG, "data length : " + gps.size());
-                for(GPSInfo one : gps) {
-                    mapMarker.createCustomMarker(one);
-                    try {
-                        sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            while (true) {
+                GPSInfo gpsInfo = server.getGPSInfo();
+                boolean isAddSuccess = puppyInfo.addGPSInfo(gpsInfo);
+                if(isAddSuccess) {
+                    DogeDB.insertGps(gpsInfo.getLat(), gpsInfo.getLon());
+                    mapMarker.createCustomMarker(gpsInfo);
                 }
+//                for(GPSInfo one : gps) {
+//                    mapMarker.createCustomMarker(one);
+//                    try {
+//                        sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
             }
         }
     }
