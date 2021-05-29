@@ -3,20 +3,17 @@ package com.capstone.puppy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.PuppyInfo.SelectPuppyAdapter;
-import com.capstone.puppy.util.DogeDB;
 
 import java.util.ArrayList;
 
@@ -129,7 +126,12 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    public void onModifyClick(){}
+//    public void onModifyClick(){
+//        Intent intent = new Intent(this, ModifyPuppyActivity.class);
+//        intent.putExtra("puppys", puppys);//데이터 보내주는 코드
+//        startActivityForResult(intent, 1);
+//
+//    }
 
     @Override
     public void onClick(View v) {
@@ -137,9 +139,9 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
             case R.id.btn_add:
                 onAddClick();
                 break;
-            case R.id.btn_mod:
-                onModifyClick();
-                break;
+//            case R.id.btn_mod:
+//                onModifyClick();
+//                break;
             case R.id.btn_del:
                 onDeleteClick();
                 break;
