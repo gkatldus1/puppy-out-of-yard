@@ -89,8 +89,10 @@ public class GPSServer extends Thread{
         switch (header){
             case 1:
                 id = Integer.parseInt(msg[1]);
-                lat = Double.parseDouble(msg[2]);
-                lon = Double.parseDouble(msg[3]);
+                lat = Double.parseDouble(msg[2])/100.0;
+                lon = Double.parseDouble(msg[3])/100.0;
+//                lat = 37.5709719;
+//                lon = 127.0707485;
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 date = sdf.format(new Date(System.currentTimeMillis()));
                 break;

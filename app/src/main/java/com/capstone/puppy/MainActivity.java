@@ -205,18 +205,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             while (true) {
                 GPSInfo gpsInfo = server.getGPSInfo();
                 boolean isAddSuccess = puppyInfo.addGPSInfo(gpsInfo);
+
                 if(isAddSuccess) {
                     DogeDB.insertGps(gpsInfo.getLat(), gpsInfo.getLon());
                     mapMarker.createCustomMarker(gpsInfo);
                 }
-//                for(GPSInfo one : gps) {
-//                    mapMarker.createCustomMarker(one);
-//                    try {
-//                        sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
