@@ -27,7 +27,6 @@ import net.daum.mf.map.api.MapView;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener {
     private final String TAG = "MainActivity";
@@ -200,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //PuppyInfo puppy = server.getDogPoints().get(0);
                 //double gps_x_info = new Double(puppy.getPointX());
                 //double gps_y_info = new Double(puppy.getPointY());
-                //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());
+                //DogeDB.insertGps(37.57026899, 127.07153637);
                 //mapMarker.createCustomMarker(puppy);
 
                 //DogeDB.insertGps(puppy.getPointX(), puppy.getPointY());

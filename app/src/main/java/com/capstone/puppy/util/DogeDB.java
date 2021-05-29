@@ -1,5 +1,6 @@
 package com.capstone.puppy.util;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 public class DogeDB{
     public final static String TAG = "DogeDB";
     static Context context;
+
 
     public static void setDogeContext(Context mcontext){
         context = mcontext;
@@ -36,6 +38,15 @@ public class DogeDB{
         String sqlCreateTb2 = "CREATE TABLE IF NOT EXISTS  GPS_INFO (id INTEGER PRIMARY KEY AUTOINCREMENT, x double, y double, time TEXT not null DEFAULT (datetime('now', 'localtime')));";
         sqliteDB.execSQL(sqlCreateTb1);
         sqliteDB.execSQL(sqlCreateTb2);
+    }
+
+    public static void updateRecord(String p_name, String p_age, int id){
+
+        Log.i(TAG, "updateRecord()");
+        ContentValues values = new ContentValues();
+        values.put("name", p_name);
+        values.put("age", p_age);
+        sqliteDB.update("DOG_INFO",values, "id=?", new String[]{Integer.toString(id)});
     }
 
 
@@ -79,4 +90,6 @@ public class DogeDB{
         sqliteDB.execSQL(sql);
 
     }
+
+
 }
