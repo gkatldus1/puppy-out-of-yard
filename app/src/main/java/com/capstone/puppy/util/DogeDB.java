@@ -55,6 +55,12 @@ public class DogeDB{
         Log.i(TAG, "sql : " + sql);
         sqliteDB.execSQL(sql);
     }
+    public static void deleteRecord(int id){
+        Log.i(TAG, "deleteRecord()");
+        String sql = "DELETE FROM DOG_INFO WHERE id = "+id+";";
+        sqliteDB.execSQL(sql);
+
+    }
 
     public static ArrayList<PuppyInfo> selectDogRecord(){
         Cursor cursor= sqliteDB.rawQuery("select * from DOG_INFO", null);
