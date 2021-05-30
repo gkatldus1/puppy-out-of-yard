@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
 import com.capstone.puppy.PuppyInfo.SelectPuppyAdapter;
+import com.capstone.puppy.util.DogeDB;
 
 import java.util.ArrayList;
 
@@ -21,22 +22,18 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
     private final String TAG = "SelectPuppyActivity";
     Button btn_add, btn_mod, btn_del;
     private ListView lv_puppys_select;
-    ArrayList<PuppyInfo> puppys;
-    ArrayList<PuppyInfo> added_puppys = null;
+    ArrayList<PuppyInfo> puppys = null;
     SelectPuppyAdapter puppyAdapter;
+    int selectedPosition = -1;
 
     @Override
     public void onBackPressed(){
         Log.i(TAG, "onBackPressed()");
-        if(added_puppys == null){
-            Log.i(TAG, "Added_Puppy is null");
-        }else{
-            Intent intent = getIntent();
-            intent.putExtra("puppys", puppys);
-            Log.i(TAG, "Added_Puppy is not null");
-            intent.putExtra("added_puppys", added_puppys);
-            setResult(RESULT_OK, intent);
-        }
+
+        Intent intent = getIntent();
+        intent.putExtra("puppys", puppys);
+        setResult(RESULT_OK, intent);
+
         finish();
     }
 
@@ -47,9 +44,10 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
 
         Intent intent = getIntent();
         if (intent != null) {
-            puppys = (ArrayList<PuppyInfo>) intent.getSerializableExtra("puppys");
-            if (puppys != null) {
-                Toast.makeText(getApplicationContext(), "전달 받은 ArrayList의 첫번째 요소 :" + puppys.get(0).getName(), Toast.LENGTH_SHORT).show();
+            puppys = intent.getParcelableArrayListExtra("puppys");
+            if (puppys != null
+            && puppys.size() > 0) {
+                Log.i(TAG, "puppys.size():" + puppys.size());
             }
         }
 
@@ -61,13 +59,16 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         lv_puppys_select.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedPosition = position;
+                puppyAdapter.setSelectedItemPosition(position);
+
                 PuppyInfo puppy = (PuppyInfo)puppyAdapter.getItem(position);
                 puppy.setChecked(!puppy.getChecked());
                 puppyAdapter.notifyDataSetChanged();
             }
         });
 
-       //btn 초기화
+        //btn 초기화
         btn_add = findViewById(R.id.btn_add);
         btn_mod = findViewById(R.id.btn_mod);
         btn_del = findViewById(R.id.btn_del);
@@ -91,7 +92,7 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
     public void onAddClick(){
         // 아이템 추가.
         Intent intent = new Intent(this, AddPuppyActivity.class);
-        intent.putExtra("puppys", puppys);//데이터 보내주는 코드
+        intent.putParcelableArrayListExtra("puppys", puppys);//데이터 보내주는 코드
         startActivityForResult(intent, 1);
 
     }
@@ -101,37 +102,37 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         super.onActivityResult(requestCode, resultCode, data);
         Log.i(TAG, "onActivityResult");
         if (resultCode == RESULT_OK){
-            if (requestCode == 1){
-                String url = data.getStringExtra("url");
-                String name = data.getStringExtra("name");
-                String age = data.getStringExtra("age");
-
-                Log.i(TAG, "intent data:" + url + " " + name + " " + age);
-                int id = 0;
-                for(int i = 0; i < puppys.size(); i++){
-                    if( id < puppys.get(i).getId())
-                        id = puppys.get(i).getId();
-                }
-                PuppyInfo puppy = new PuppyInfo(id+1, url, name, age);
-                puppys.add(puppy);
-                puppyAdapter.notifyDataSetChanged();
-
-                if(added_puppys == null) {
-                    added_puppys = new ArrayList<>();
-                    Log.i(TAG, "added_puppy new instance");
-                }
-                added_puppys.add(puppy);
-                Log.i(TAG, "added_puppy added");
+            switch (requestCode){
+                case 1:
+                    puppys = data.getParcelableArrayListExtra("puppys");
+                    puppyAdapter = new SelectPuppyAdapter(puppys);
+                    lv_puppys_select.setAdapter(puppyAdapter);
+                    puppyAdapter.notifyDataSetChanged();
+                    Log.i(TAG, "puppy ui update");
+                    break;
+                case 2:
+                    PuppyInfo new_puppy = data.getParcelableExtra("puppy");
+                    PuppyInfo old_puppy = puppys.get(selectedPosition);
+                    old_puppy.setName(new_puppy.getName());
+                    old_puppy.setAge(new_puppy.getAge());
+                    old_puppy.setImageUrl(new_puppy.getImageUrl());
+                    puppyAdapter = new SelectPuppyAdapter(puppys);
+                    lv_puppys_select.setAdapter(puppyAdapter);
+                    puppyAdapter.notifyDataSetChanged();
+                    Log.i(TAG, "puppy ui update");
+                    break;
             }
         }
     }
 
-//    public void onModifyClick(){
-//        Intent intent = new Intent(this, ModifyPuppyActivity.class);
-//        intent.putExtra("puppys", puppys);//데이터 보내주는 코드
-//        startActivityForResult(intent, 1);
-//
-//    }
+    public void onModifyClick(){
+        if(selectedPosition != -1) {
+            PuppyInfo puppy = puppys.get(selectedPosition);
+            Intent intent = new Intent(this, ModifyPuppyActivity.class);
+            intent.putExtra("puppy", puppy);//데이터 보내주는 코드
+            startActivityForResult(intent, 2);
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -139,9 +140,9 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
             case R.id.btn_add:
                 onAddClick();
                 break;
-//            case R.id.btn_mod:
-//                onModifyClick();
-//                break;
+            case R.id.btn_mod:
+                onModifyClick();
+                break;
             case R.id.btn_del:
                 onDeleteClick();
                 break;

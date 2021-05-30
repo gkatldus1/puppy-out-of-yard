@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.btn_menu:
                 Intent intent = new Intent(this, SelectPuppyActivity.class);
-                intent.putExtra("puppys", puppys);
+                intent.putParcelableArrayListExtra("puppys", puppys);
                 startActivityForResult(intent, 1);
                 break;
         }
@@ -80,12 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (resultCode == RESULT_OK){
             if (requestCode == 1){
-                ArrayList<PuppyInfo> new_puppys_temp = (ArrayList<PuppyInfo>) data.getSerializableExtra("added_puppys");
-                for(PuppyInfo puppy : new_puppys_temp) {
-                    DogeDB.insertRecord("DOG_INFO", puppy.getName(), puppy.getAge());
-                    puppys.add(puppy);
-                    Log.i(TAG, "add puppy complete");
-                }
+                puppys = data.getParcelableArrayListExtra("puppys");
                 puppyAdapter.notifyDataSetChanged();
                 Log.i(TAG, "puppy ui update");
             }
@@ -110,10 +105,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void DBInit(){
-       DogeDB.setDogeContext(this);
-       DogeDB.makeTable();
-       //puppys = DogeDB.getPuppysInfo();
-        puppys = puppyInit(); //임시로 넣음
+        DogeDB.setDogeContext(this);
+        DogeDB.makeTable();
+        puppys = DogeDB.selectDogRecord();
+//        puppys = puppyInit(); //임시로 넣음
     }
 
     
@@ -190,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     class ProcessThread extends Thread{
         private final String TAG = "ProcessThread";
-        PuppyInfo puppyInfo;
         @Override
         public void run() {
             try {
@@ -200,21 +194,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             Log.i(TAG, "ProcessThread is Start");
 
-            puppyInfo = puppys.get(0);
-
             while (true) {
-                GPSInfo gpsInfo = server.getGPSInfo();
-                boolean isAddSuccess = puppyInfo.addGPSInfo(gpsInfo);
+                for(PuppyInfo puppyInfo: puppys) {
+                    GPSInfo gpsInfo = server.getGPSInfo();
+                    boolean isAddSuccess = puppyInfo.addGPSInfo(gpsInfo);
 
-                if(isAddSuccess) {
-                    DogeDB.insertGps(gpsInfo.getLat(), gpsInfo.getLon());
-                    mapMarker.createCustomMarker(gpsInfo);
-                }
+                    if (isAddSuccess) {
+                        DogeDB.insertGps(gpsInfo.getLat(), gpsInfo.getLon());
+                        mapMarker.createCustomMarker(gpsInfo);
+                    }
 
-                try {
-                    sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

@@ -40,8 +40,7 @@ public class DogeDB{
         sqliteDB.execSQL(sqlCreateTb2);
     }
 
-    public static void updateRecord(String p_name, String p_age, int id){
-
+    public static void updateRecord(String p_name, String p_age,String url, int id){
         Log.i(TAG, "updateRecord()");
         ContentValues values = new ContentValues();
         values.put("name", p_name);
@@ -50,7 +49,7 @@ public class DogeDB{
     }
 
 
-    public static void insertRecord(String dbName, String p_name, String p_age ){
+    public static void insertRecord(String dbName, String p_name, String p_age, String url ){
         Log.i(TAG, "insertRecord()");
         String sql = "insert into " + dbName + " (name, age) values ('" + p_name + "','" + p_age + "');";
         Log.i(TAG, "sql : " + sql);
@@ -61,9 +60,15 @@ public class DogeDB{
         Cursor cursor= sqliteDB.rawQuery("select * from DOG_INFO", null);
         ArrayList<PuppyInfo> puppys = new ArrayList<>();
         cursor.moveToFirst();
-        puppys.add(new PuppyInfo(cursor.getString(1), cursor.getString(2)));
+        //puppys.add(new PuppyInfo(cursor.getString(1), cursor.getString(2), ""));
         while (cursor.moveToNext()){
-            puppys.add(new PuppyInfo(cursor.getString(1), cursor.getString(2)));
+            int id = cursor.getInt(0);
+            String url = "";
+            String name = cursor.getString(1);
+            String age = cursor.getString(2);
+            PuppyInfo puppy = new PuppyInfo(id, name, age, url);
+            Log.i(TAG, "id:" + id + " name:" + name + " age:" + age + " url:"+url);
+            puppys.add(puppy);
         }
         return puppys;
     }

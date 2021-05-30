@@ -1,5 +1,6 @@
 package com.capstone.puppy.PuppyInfo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,20 @@ import com.capstone.puppy.R;
 
 import java.util.ArrayList;
 
+import static com.capstone.puppy.R.color.purple_200;
+
 public class SelectPuppyAdapter extends BaseAdapter {
     private ArrayList<PuppyInfo> puppys = null;
     LayoutInflater inflater = null;
+    int selectedItemPosition = -1;
+
+    public void setSelectedItemPosition(int position){
+        this.selectedItemPosition = position;
+    }
+
+    public int getSelectedItemPosition(){
+        return selectedItemPosition;
+    }
 
     public SelectPuppyAdapter(ArrayList<PuppyInfo> puppys){
         this.puppys = puppys;
@@ -36,6 +48,7 @@ public class SelectPuppyAdapter extends BaseAdapter {
         return 0;
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         if (view == null)
@@ -45,6 +58,11 @@ public class SelectPuppyAdapter extends BaseAdapter {
                 inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             view = inflater.inflate(R.layout.listview_item, viewGroup, false);
+        }
+        if (i == selectedItemPosition){
+            view.setBackgroundColor(purple_200);
+        }else{
+            view.setBackgroundColor(0);
         }
 
         TextView tv_puppy_name = (TextView)view.findViewById(R.id.tv_puppy_name);
