@@ -83,6 +83,7 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         for(int i = puppyAdapter.getCount()-1; i>=0; i--){
             PuppyInfo puppy = (PuppyInfo)puppyAdapter.getItem(i);
             if(puppy.getChecked()){
+//                DogeDB.Delete(puppy.getId());
                 puppys.remove(i);
             }
         }
@@ -101,6 +102,9 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i(TAG, "onActivityResult");
+
+        //지금은 새로운 puppys를 생성하고, 새로운 Adapter를 생성하고, 리스트뷰에 어댑터를 새로 등록했다.
+        //기존 puppys를 수정하고, 변경사항이 있다고 Adapter에게 알려주는 방식으로 바꿔야하 한다.
         if (resultCode == RESULT_OK){
             switch (requestCode){
                 case 1:
