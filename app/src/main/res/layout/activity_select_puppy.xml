@@ -7,9 +7,11 @@
     <ListView
         android:id="@+id/lv_puppys_select"
         android:layout_width="384dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:padding="0dp" />
 
 
     <LinearLayout
@@ -37,8 +39,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Delete" />
-
     </LinearLayout>
-
-
 </LinearLayout>

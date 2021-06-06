@@ -49,16 +49,16 @@ public class AddPuppyActivity extends AppCompatActivity implements View.OnClickL
             // 강아지 이름을 입력받고 저장하기.
             case R.id.btn_add:
 //                String puppy_image = iv_puppy;
-                String url = "temp";
                 String name = et_name.getText().toString();
                 String age = et_age.getText().toString();
+                String url = "temp";
                 int id = -1;
                 for(int i = 0; i < puppys.size(); i++){
                     if( id < puppys.get(i).getId())
                         id = puppys.get(i).getId();
                 }
 
-                PuppyInfo puppy = new PuppyInfo(id+1, url, name, age);
+                PuppyInfo puppy = new PuppyInfo(id+1, name, age, url);
                 DogeDB.insertRecord("DOG_INFO", puppy.getName(), puppy.getAge(), "");
                 puppys.add(puppy);
 

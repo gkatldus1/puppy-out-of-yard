@@ -59,7 +59,6 @@ public class DogeDB{
         Log.i(TAG, "deleteRecord()");
         String sql = "DELETE FROM DOG_INFO WHERE id = "+id+";";
         sqliteDB.execSQL(sql);
-
     }
 
     public static ArrayList<PuppyInfo> selectDogRecord(){
@@ -88,7 +87,8 @@ public class DogeDB{
         id_num = 10;
         start = 1;
 
-        Cursor cursor = sqliteDB.rawQuery("select * from GPS_INFO where id >="+ start + " and id<=" + id_num , null);
+//        Cursor cursor = sqliteDB.rawQuery("select * from GPS_INFO where id >="+ start + " and id<=" + id_num , null);
+        Cursor cursor = sqliteDB.rawQuery("select * from GPS_INFO" , null);
         cursor.moveToFirst();
         ArrayList<GPSInfo> gps = new ArrayList<>();
 

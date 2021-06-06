@@ -83,7 +83,7 @@ public class SelectPuppyActivity extends AppCompatActivity implements View.OnCli
         for(int i = puppyAdapter.getCount()-1; i>=0; i--){
             PuppyInfo puppy = (PuppyInfo)puppyAdapter.getItem(i);
             if(puppy.getChecked()){
-//                DogeDB.Delete(puppy.getId());
+                DogeDB.deleteRecord(puppy.getId());
                 puppys.remove(i);
             }
         }

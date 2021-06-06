@@ -102,6 +102,9 @@ public class PuppyInfo implements Parcelable {
 
     public boolean addGPSInfo(GPSInfo gpsInfo){
         GPSInfo lastInfo;
+        if(gps == null)
+            gps = new ArrayList<GPSInfo>();
+
         if(gps.size() <= 0) {
             gps.add(gpsInfo);
             return true;
