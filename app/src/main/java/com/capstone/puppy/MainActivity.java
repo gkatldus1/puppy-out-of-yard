@@ -1,9 +1,14 @@
 package com.capstone.puppy;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -11,25 +16,27 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.capstone.puppy.PuppyInfo.GPSInfo;
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
 import com.capstone.puppy.PuppyInfo.PuppyInfo;
-import com.capstone.puppy.Socket.GPSServer;
+import com.capstone.puppy.Socket.GPSClient;
 import com.capstone.puppy.util.DogeDB;
 
 import net.daum.android.map.MapViewEventListener;
 import net.daum.mf.map.api.MapPoint;
-import net.daum.mf.map.api.MapPolyline;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener, LocationListener {
     private final String TAG = "MainActivity";
     private Button btn_menu;
     private Button btn_search_start;
@@ -38,10 +45,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListView lv_puppys;
 
     ArrayList<PuppyInfo> puppys;
-    GPSServer server;
+    GPSClient client;
     MapMarker mapMarker;
 
     MainPuppyAdapter puppyAdapter;
+
+    LocationManager locationManager;
+    LocationListener locationListener;
 
     ProcessThread processThread;
 
@@ -52,12 +62,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DBInit();
-        serverInit();
         viewInit();
+//        DBInit();
+        networkInit();
+        GPSInit();
+
         mapAPIInit();
 
-        processThread = new ProcessThread();
+        processThread = new ProcessThread(getBaseContext());
         processThread.start();
         // getAppKeyHash();
 
@@ -65,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_menu:
                 Intent intent = new Intent(this, SelectPuppyActivity.class);
                 intent.putParcelableArrayListExtra("puppys", puppys);
@@ -87,11 +99,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.i(TAG, "onActivityResult");
         Log.i(TAG, "RESULT:" + resultCode);
         Log.i(TAG, "REQUEST:" + requestCode);
-        if(data == null)
+        if (data == null)
             return;
 
-        if (resultCode == RESULT_OK){
-            if (requestCode == 1){
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
                 puppys = data.getParcelableArrayListExtra("puppys");
                 puppyAdapter = new MainPuppyAdapter(puppys);
                 lv_puppys.setAdapter(puppyAdapter);
@@ -118,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void DBInit(){
+    private void DBInit() {
         DogeDB.setDogeContext(this);
         DogeDB.makeTable();
         puppys = DogeDB.selectDogRecord();
@@ -193,11 +205,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        puppys = puppyInit(); //임시로 넣음
     }
 
-    
 
-    private void serverInit(){
-        server = new GPSServer(puppys);
-        server.start();
+    private void networkInit() {
+        client = new GPSClient("172.16.100.216", 1236);
+        client.execute();
+    }
+
+    private void GPSInit() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // Here, thisActivity is the current activity
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                    // Show an expanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            }
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
     }
 
     private void viewInit() {
@@ -217,12 +268,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMapView.setMapViewEventListener(this);
     }
 
-    private void mapAPIInit(){
+    private void mapAPIInit() {
         mapMarker = new MapMarker(mMapView);
 
     }
 
-    private ArrayList<PuppyInfo> puppyInit(){
+    private ArrayList<PuppyInfo> puppyInit() {
         ArrayList<PuppyInfo> temp_puppys = new ArrayList<PuppyInfo>();
 
         temp_puppys.add(new PuppyInfo(1, "image/1.png", "테슬라", "589달러"));
@@ -270,21 +321,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    class ProcessThread extends Thread{
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        Log.i(TAG, "onLocationChanged");
+        String data = "";
+        if(location == null)
+            return;
+
+        data = "Lat:" + location.getLatitude();
+        data += " Lon: " + location.getLongitude();
+        client.SendDataToNetwork(data);
+    }
+
+    class ProcessThread extends Thread {
         private final String TAG = "ProcessThread";
         ArrayList<GPSInfo> gpsInfos;
+        Context context;
 
-
-
-    @Override
+        public ProcessThread(Context context){
+            this.context = context;
+        }
+        @Override
         public void run() {
             try {
                 gpsInfos = new ArrayList<>();
-                gpsInfos = DogeDB.selectGpsRecord();
+//                gpsInfos = DogeDB.selectGpsRecord();
 
                 sleep(100);
 
                 Log.i(TAG, "ProcessThread is Start");
+
 
                 while (true) {
     //                for(PuppyInfo puppyInfo: puppys) {
@@ -302,18 +368,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //                        e.printStackTrace();
     //                    }
     //                }
-                    for (GPSInfo gpsInfo : gpsInfos) {
-                        if(!isSearching)
-                            break;
-                        mapMarker.changeCustomMarker(gpsInfo);
-                        mapMarker.addPolyLine(gpsInfo);
-                        try {
-                            sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    isSearching = false;
+//                    for (GPSInfo gpsInfo : gpsInfos) {
+//                        if(!isSearching)
+//                            break;
+//                        mapMarker.changeCustomMarker(gpsInfo);
+//                        mapMarker.addPolyLine(gpsInfo);
+//                        try {
+//                            sleep(500);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    isSearching = false;
+                    Log.i(TAG, "ProcessThread Loop");
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    onLocationChanged(location);
+
                     sleep(1000);
                 }
             } catch (InterruptedException e) {

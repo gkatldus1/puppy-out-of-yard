@@ -22,7 +22,10 @@ public class MainPuppyAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return puppys.size();
+        if(puppys == null)
+            return 0;
+        else
+            return puppys.size();
     }
 
     @Override
