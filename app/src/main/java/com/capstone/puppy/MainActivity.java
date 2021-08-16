@@ -1,13 +1,10 @@
 package com.capstone.puppy;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Base64;
@@ -15,12 +12,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.capstone.puppy.PuppyInfo.GPSInfo;
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
@@ -29,18 +24,23 @@ import com.capstone.puppy.Socket.GPSClient;
 import com.capstone.puppy.util.DogeDB;
 
 import net.daum.android.map.MapViewEventListener;
+import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
 
 import java.security.MessageDigest;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener, LocationListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener {
     private final String TAG = "MainActivity";
     private Button btn_menu;
-    private Button btn_search_start;
-    private Button btn_search_reset;
+    private Button btn_search;
+    private Button btn_start;
+    private Button btn_reset;
     private MapView mMapView;
     private ListView lv_puppys;
 
@@ -50,11 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     MainPuppyAdapter puppyAdapter;
 
-    LocationManager locationManager;
-    LocationListener locationListener;
-
     ProcessThread processThread;
 
+    private boolean isRecording = false;
     private boolean isSearching = false;
 
     @SuppressLint("WrongViewCast")
@@ -63,16 +61,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         viewInit();
-//        DBInit();
+        DBInit();
         networkInit();
-        GPSInit();
 
         mapAPIInit();
+
 
         processThread = new ProcessThread(getBaseContext());
         processThread.start();
         // getAppKeyHash();
-
     }
 
     @Override
@@ -83,12 +80,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putParcelableArrayListExtra("puppys", puppys);
                 startActivityForResult(intent, 1);
                 break;
-            case R.id.btn_search_start:
-                isSearching = true;
+            case R.id.btn_search:
+                if(isRecording)
+                    Toast.makeText(getBaseContext(), "Please Stop Recording First", Toast.LENGTH_SHORT).show();
+                else {
+                    isSearching = !isSearching;
+                    mapMarker.resetAll();
+                    DateTimePicker dateTimePicker = new DateTimePicker(MainActivity.this, new DateTimePicker.ReturnEventListener() {
+                        @Override
+                        public void customDialogEvent(Date start_date, Time start_time, Date end_date, Time end_time) {
+                            //Select DB
+                            List<GPSInfo> gpsInfos = DogeDB.selectGpsRecord(start_date, start_time, end_date, end_time);
+                            for(GPSInfo gpsInfo : gpsInfos){
+                                mapMarker.changeCustomMarker(gpsInfo.getLat(),gpsInfo.getLon());
+                                mapMarker.addPolyLine(gpsInfo.getLat(),gpsInfo.getLon());
+                            }
+                        }
+                    });
+
+                    dateTimePicker.show();
+                }
                 break;
-            case R.id.btn_search_reset:
+            case R.id.btn_start:
+                if(isSearching)
+                    isSearching = false;
+                isRecording = !isRecording;
+                if(isRecording)
+                    btn_start.setText("Recording...");
+                else
+                    btn_start.setText("Record");
+                break;
+            case R.id.btn_reset:
                 mapMarker.resetAll();
-                isSearching = false;
                 break;
         }
     }
@@ -207,48 +230,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void networkInit() {
-        client = new GPSClient("172.16.100.216", 1236);
-        client.execute();
-    }
-
-    private void GPSInit() {
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // Here, thisActivity is the current activity
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                    // Show an expanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-
-                } else {
-
-                    // No explanation needed, we can request the permission.
-
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                }
-            }
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
+        client = new GPSClient("172.30.1.14", 1238);
+        client.start();
     }
 
     private void viewInit() {
@@ -257,20 +240,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lv_puppys.setAdapter(puppyAdapter);
 
         btn_menu = findViewById(R.id.btn_menu);
-        btn_search_start = findViewById(R.id.btn_search_start);
-        btn_search_reset = findViewById(R.id.btn_search_reset);
+        btn_search = findViewById(R.id.btn_search);
+        btn_start = findViewById(R.id.btn_start);
+        btn_reset = findViewById(R.id.btn_reset);
         btn_menu.setOnClickListener(this);
-        btn_search_start.setOnClickListener(this);
-        btn_search_reset.setOnClickListener(this);
+        btn_search.setOnClickListener(this);
+        btn_start.setOnClickListener(this);
+        btn_reset.setOnClickListener(this);
 
         mMapView = (MapView) findViewById(R.id.map_view);
-        mMapView.setDaumMapApiKey(MapApiConst.DAUM_MAPS_ANDROID_APP_API_KEY);
-        mMapView.setMapViewEventListener(this);
     }
 
     private void mapAPIInit() {
-        mapMarker = new MapMarker(mMapView);
+        mMapView.setDaumMapApiKey(MapApiConst.DAUM_MAPS_ANDROID_APP_API_KEY);
+        mMapView.setMapViewEventListener(this);
+        mMapView.setCurrentLocationEventListener(this);
 
+        //지도회전 안함, 좌표로 화면 이동
+        //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+
+        //지도회전 안함, 화면이동 안함
+        mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
+
+        //지도회전, 좌표로 화면 이동
+        //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
+
+        //지도회전, 화면이동 안함
+        //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeadingWithoutMapMoving);
+
+        //지도회전 안함, 마커특수효과?, 맵이동 안함
+        //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithMarkerHeadingWithoutMapMoving);
+        //mMapView.setCurrentLocationRadius(0);
+
+        //전부 끄기
+        //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
+        //mMapView.setShowCurrentLocationMarker(false);
+
+        //커스텀 마커
+        //mMapView.setCurrentLocationRadius(100); // meter
+        //mMapView.setCurrentLocationRadiusFillColor(Color.argb(77, 255, 255, 0));
+        //mMapView.setCurrentLocationRadiusStrokeColor(Color.argb(77, 255, 165, 0));
+
+        MapPOIItem.ImageOffset trackingImageAnchorPointOffset = new MapPOIItem.ImageOffset(28, 28); // 좌하단(0,0) 기준 앵커포인트 오프셋
+        //MapPOIItem.ImageOffset directionImageAnchorPointOffset = new MapPOIItem.ImageOffset(65, 65);
+        //MapPOIItem.ImageOffset offImageAnchorPointOffset = new MapPOIItem.ImageOffset(15, 15);
+        mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.custom_arrow_map_present_tracking, trackingImageAnchorPointOffset);
+        mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.glass, trackingImageAnchorPointOffset);
+        //mMapView.setCustomCurrentLocationMarkerDirectionImage(R.drawable.custom_map_present_direction, directionImageAnchorPointOffset);
+        //mMapView.setCustomCurrentLocationMarkerImage(R.drawable.custom_map_present, offImageAnchorPointOffset);
+
+        mapMarker = new MapMarker(mMapView);
     }
 
     private ArrayList<PuppyInfo> puppyInit() {
@@ -298,7 +317,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onCurrentLocationUpdate(net.daum.mf.map.api.MapView mapView, MapPoint mapPoint, float v) {
-
+        MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
+        Log.i(TAG, String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)", mapPointGeo.latitude, mapPointGeo.longitude, v));
+        String data = mapPointGeo.latitude + "," + mapPointGeo.longitude + ",";
+        client.sendData(data);
     }
 
     @Override
@@ -321,26 +343,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Log.i(TAG, "onLocationChanged");
-        String data = "";
-        if(location == null)
-            return;
-
-        data = "Lat:" + location.getLatitude();
-        data += " Lon: " + location.getLongitude();
-        client.SendDataToNetwork(data);
-    }
-
     class ProcessThread extends Thread {
         private final String TAG = "ProcessThread";
         ArrayList<GPSInfo> gpsInfos;
         Context context;
 
-        public ProcessThread(Context context){
+        public ProcessThread(Context context) {
             this.context = context;
         }
+
         @Override
         public void run() {
             try {
@@ -353,38 +364,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                 while (true) {
-    //                for(PuppyInfo puppyInfo: puppys) {
-    //                    GPSInfo gpsInfo = server.getGPSInfo();
-    //                    boolean isAddSuccess = puppyInfo.addGPSInfo(gpsInfo);
-    //
-    //                    if (isAddSuccess) {
-    //                        DogeDB.insertGps(gpsInfo.getLat(), gpsInfo.getLon());
-    //                        mapMarker.createCustomMarker(gpsInfo);
-    //                    }
-    //
-    //                    try {
-    //                        sleep(1000);
-    //                    } catch (InterruptedException e) {
-    //                        e.printStackTrace();
-    //                    }
-    //                }
-//                    for (GPSInfo gpsInfo : gpsInfos) {
-//                        if(!isSearching)
-//                            break;
-//                        mapMarker.changeCustomMarker(gpsInfo);
-//                        mapMarker.addPolyLine(gpsInfo);
-//                        try {
-//                            sleep(500);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    isSearching = false;
-                    Log.i(TAG, "ProcessThread Loop");
-                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    onLocationChanged(location);
+                    //Log.i(TAG, "ProcessThread Loop");
 
-                    sleep(1000);
+                    //mapMarker.changeCustomMarker(location.getLatitude(), location.getLongitude());
+                    //서버로부터 데이터 수신
+                    String data = client.getData();
+                    try{
+                        if(data != null && !isSearching) {
+                            String[] spl_data = data.split(",");
+
+                            double lat = Double.parseDouble(spl_data[0]);
+                            double lon = Double.parseDouble(spl_data[1]);
+
+
+                            if(mapMarker.comparePosition(lat, lon)) {
+                                mapMarker.changeCustomMarker(lat, lon);
+                                mapMarker.addPolyLine(lat, lon);
+                                DogeDB.insertGps(lat, lon);
+                            }
+                        }
+                    }catch (Exception e){
+                        if(e instanceof NullPointerException)
+                            e.printStackTrace();
+                        if(e instanceof NumberFormatException)
+                            e.printStackTrace();
+                    }
+                    sleep(100);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

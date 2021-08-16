@@ -52,13 +52,19 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <Button
-                android:id="@+id/btn_search_start"
+                android:id="@+id/btn_search"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:text="Search"/>
 
             <Button
-                android:id="@+id/btn_search_reset"
+                android:id="@+id/btn_start"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Start"/>
+
+            <Button
+                android:id="@+id/btn_reset"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:text="Clear"/>

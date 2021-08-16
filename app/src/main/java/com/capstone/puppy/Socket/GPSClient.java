@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 
 
 /*
@@ -18,7 +19,7 @@ header(byte)
 */
 
 //안드로이드 메인스레드에서 Socket을 사용할 수 없어서 AsyncTask로 변경
-public class GPSClient extends AsyncTask<Void, byte[], Boolean> {
+public class GPSClient {
     private static final String TAG = "GPSClient";
 
     Socket nsocket; //Network Socket
@@ -28,69 +29,107 @@ public class GPSClient extends AsyncTask<Void, byte[], Boolean> {
     String ip;
     int port;
 
+    String data = null;
+
     public GPSClient(String ip, int port){
         this.ip = ip;
         this.port = port;
     }
 
-    public
-
-    @Override
-    protected Boolean doInBackground(Void... params) { //This runs on a different thread
-        boolean result = false;
-        try {
-            Log.i(TAG, "doInBackground: Creating socket");
-            SocketAddress sockaddr = new InetSocketAddress(ip, port);
-            nsocket = new Socket();
-            nsocket.connect(sockaddr, 5000); //5 second connection timeout
-            if (nsocket.isConnected()) {
-                nis = nsocket.getInputStream();
-                nos = nsocket.getOutputStream();
-                Log.i(TAG, "doInBackground: Socket created, streams assigned");
-                Log.i(TAG, "doInBackground: Waiting for initial data...");
-                byte[] buffer = new byte[4096];
-                int read = nis.read(buffer, 0, 4096); //This is blocking
-                while(read != -1){
-                    byte[] tempdata = new byte[read];
-                    System.arraycopy(buffer, 0, tempdata, 0, read);
-                    publishProgress(tempdata);
-                    Log.i(TAG, "doInBackground: Got some data");
-                    read = nis.read(buffer, 0, 4096); //This is blocking
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.i(TAG, "doInBackground: IOException");
-            result = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i(TAG, "doInBackground: Exception");
-            result = true;
-        } finally {
-            try {
-                nis.close();
-                nos.close();
-                nsocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Log.i(TAG, "doInBackground: Finished");
+    public String getData() {
+        if(data == null)
+            return null;
+        else {
+            String temp = data;
+            data = null;
+            return temp;
         }
-        return result;
+
     }
 
-    public void SendDataToNetwork(String cmd) { //You run this from the main thread.
-        try {
-            if (nsocket.isConnected()) {
-                Log.i(TAG, "SendDataToNetwork: Writing received message to socket");
-                nos.write(cmd.getBytes());
-            } else {
-                Log.i(TAG, "SendDataToNetwork: Cannot send message. Socket is closed");
+    public void sendData(String data){
+        GPSSender gpsSender = new GPSSender(data);
+        gpsSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void start(){
+        GPSReceiver gpsReceiver = new GPSReceiver();
+        gpsReceiver.execute();
+    }
+
+    class GPSReceiver extends AsyncTask<Void, byte[], Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            boolean result = false;
+            try {
+                Log.i(TAG, "doInBackground: Creating socket");
+                SocketAddress sockaddr = new InetSocketAddress(ip, port);
+                nsocket = new Socket();
+                nsocket.connect(sockaddr, 5000); //5 second connection timeout
+
+                byte[] buffer = new byte[1024];
+                if (nsocket.isConnected()) {
+                    nis = nsocket.getInputStream();
+                    nos = nsocket.getOutputStream();
+                    Log.i(TAG, "Socket created, streams assigned");
+                    Log.i(TAG, "Waiting for initial data...");
+
+                    int read = nis.read(buffer, 0, 1024); //This is blocking
+                    while(read != -1){
+                        byte[] tempdata = new byte[read];
+
+                        System.arraycopy(buffer, 0, tempdata, 0, read);
+                        data = new String(tempdata);
+                        Log.i(TAG, "getData:" + data);
+                        publishProgress(tempdata);
+                        read = nis.read(buffer, 0, 1024); //This is blocking
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.i(TAG, "doInBackground: IOException");
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i(TAG, "doInBackground: Exception");
+                result = true;
+            } finally {
+                try {
+                    nis.close();
+                    nos.close();
+                    nsocket.close();
+                    data = null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.i(TAG, "doInBackground: Finished");
             }
-        } catch (Exception e) {
-            Log.i(TAG, "SendDataToNetwork: Message send failed. Caught an exception");
+            return result;
+        }
+    }
+
+    class GPSSender extends AsyncTask<Void, byte[], Boolean>{
+        String data;
+        GPSSender(String data){
+            this.data = data;
+        }
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                if (nsocket.isConnected()) {
+                    Log.i(TAG, "Send Data:"+data);
+                    nos.write(data.getBytes());
+                } else {
+                    Log.i(TAG, "Socket is closed");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.i(TAG, "Caught an exception");
+            }
+            return true;
         }
     }
 }
