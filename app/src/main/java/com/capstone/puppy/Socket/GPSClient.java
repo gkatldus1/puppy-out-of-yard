@@ -31,6 +31,8 @@ public class GPSClient {
 
     String data = null;
 
+    boolean isUser;
+
     public GPSClient(String ip, int port){
         this.ip = ip;
         this.port = port;
@@ -50,15 +52,20 @@ public class GPSClient {
     public void sendData(String data){
         GPSSender gpsSender = new GPSSender(data);
         gpsSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
 
-    public void start(){
-        GPSReceiver gpsReceiver = new GPSReceiver();
+    public void start(boolean isUser){
+        this.isUser = isUser;
+        GPSReceiver gpsReceiver = new GPSReceiver(isUser);
         gpsReceiver.execute();
     }
 
     class GPSReceiver extends AsyncTask<Void, byte[], Boolean>{
-
+        boolean isUser;
+        GPSReceiver(boolean isUser){
+            this.isUser = isUser;
+        }
         @Override
         protected Boolean doInBackground(Void... voids) {
             boolean result = false;
@@ -75,6 +82,10 @@ public class GPSClient {
                     Log.i(TAG, "Socket created, streams assigned");
                     Log.i(TAG, "Waiting for initial data...");
 
+                    if(isUser) {
+                        GPSSender gpsSender = new GPSSender("U:");
+                        gpsSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
                     int read = nis.read(buffer, 0, 1024); //This is blocking
                     while(read != -1){
                         byte[] tempdata = new byte[read];
@@ -114,7 +125,7 @@ public class GPSClient {
     class GPSSender extends AsyncTask<Void, byte[], Boolean>{
         String data;
         GPSSender(String data){
-            this.data = data;
+            this.data = data + "\r\n";
         }
         @Override
         protected Boolean doInBackground(Void... voids) {
@@ -127,7 +138,12 @@ public class GPSClient {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.i(TAG, "Caught an exception");
+                Log.i(TAG, "Caught an IOException");
+                start(isUser);
+            } catch (NullPointerException e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "Caught an NullPointerException");
             }
             return true;
         }

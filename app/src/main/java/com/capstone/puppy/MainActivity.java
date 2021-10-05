@@ -1,8 +1,10 @@
 package com.capstone.puppy;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -16,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.capstone.puppy.PuppyInfo.GPSInfo;
 import com.capstone.puppy.PuppyInfo.MainPuppyAdapter;
@@ -34,6 +38,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, net.daum.mf.map.api.MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, MapViewEventListener {
     private final String TAG = "MainActivity";
@@ -55,17 +61,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isRecording = false;
     private boolean isSearching = false;
 
+    private boolean isUser = true; // 유저인지 아닌지 플래그
+
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         viewInit();
         DBInit();
-        networkInit();
+        networkInit(isUser);
 
         mapAPIInit();
-
 
         processThread = new ProcessThread(getBaseContext());
         processThread.start();
@@ -229,9 +237,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void networkInit() {
-        client = new GPSClient("172.30.1.14", 1238);
-        client.start();
+    private void networkInit(boolean isUser) {
+        client = new GPSClient("172.16.100.223", 1234);
+        client.start(isUser);
     }
 
     private void viewInit() {
@@ -252,6 +260,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void mapAPIInit() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            // ask permissions here using below code
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        }
+
         mMapView.setDaumMapApiKey(MapApiConst.DAUM_MAPS_ANDROID_APP_API_KEY);
         mMapView.setMapViewEventListener(this);
         mMapView.setCurrentLocationEventListener(this);
@@ -317,10 +333,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onCurrentLocationUpdate(net.daum.mf.map.api.MapView mapView, MapPoint mapPoint, float v) {
-        MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
-        Log.i(TAG, String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)", mapPointGeo.latitude, mapPointGeo.longitude, v));
-        String data = mapPointGeo.latitude + "," + mapPointGeo.longitude + ",";
-        client.sendData(data);
+        if(!isUser) {
+            MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
+            Log.i(TAG, String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)", mapPointGeo.latitude, mapPointGeo.longitude, v));
+            String data = "D:" + mapPointGeo.latitude + "," + mapPointGeo.longitude + ",";
+            client.sendData(data);
+        }
     }
 
     @Override
@@ -371,16 +389,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String data = client.getData();
                     try{
                         if(data != null && !isSearching) {
-                            String[] spl_data = data.split(",");
+                            String[] cmd = data.split(":");
+                            if(cmd[0].equals("S")){
+                                Log.i(TAG, cmd[1]);
+                            }else if(cmd[0].equals("D")){
+                                String[] gps = cmd[1].split(",");
+                                double lat = Double.parseDouble(gps[0]);
+                                double lon = Double.parseDouble(gps[1]);
 
-                            double lat = Double.parseDouble(spl_data[0]);
-                            double lon = Double.parseDouble(spl_data[1]);
-
-
-                            if(mapMarker.comparePosition(lat, lon)) {
-                                mapMarker.changeCustomMarker(lat, lon);
-                                mapMarker.addPolyLine(lat, lon);
-                                DogeDB.insertGps(lat, lon);
+                                if(mapMarker.comparePosition(lat, lon)) {
+                                    mapMarker.changeCustomMarker(lat, lon);
+                                    mapMarker.addPolyLine(lat, lon);
+                                    DogeDB.insertGps(lat, lon);
+                                }
                             }
                         }
                     }catch (Exception e){
